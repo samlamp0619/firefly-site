@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>萨姆萤光灯 · 流萤翻唱小站</title>
+  <meta name="description" content="一只高三萤厨，只做流萤翻唱的小 up 主。" />
+  <meta name="theme-color" content="#fdf2ff" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- 背景图轮播 -->
+  <div id="bg-carousel" aria-hidden="true">
+    <div class="bg-layer"></div>
+    <div class="bg-layer"></div>
+    <div class="bg-overlay"></div>
+  </div>
+  <div class="bg-credit" id="bg-credit-bar">
+    <span id="bg-credit"></span>
+    <label class="rt-toggle" title="开启后只轮播实时拉取的图，不显示本地兜底图">
+      <input type="checkbox" id="rt-only" />
+      <span class="rt-track"><span class="rt-thumb"></span></span>
+      <span class="rt-label">只看实时</span>
+    </label>
+    <button type="button" id="bg-refresh" title="从 Pixiv 镜像实时拉取新背景图">🔄 换一批</button>
+  </div>
+
+  <!-- 背景粒子画布：樱花 + 萤火虫 -->
+  <canvas id="fx-canvas" aria-hidden="true"></canvas>
+
+  <header class="site-header" id="site-header">
+    <nav class="nav container">
+      <a class="logo" href="#hero">✨ 萨姆萤光灯</a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="打开菜单" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#hero">首页</a></li>
+        <li><a href="#about">关于我</a></li>
+        <li><a href="#projects">作品</a></li>
+        <li><a href="#contact">联系我</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ============ 首页 Hero ============ -->
+    <section id="hero" class="hero">
+      <div class="hero-inner container">
+        <div class="hero-text">
+          <h1 class="reveal">萨姆萤光灯</h1>
+          <div class="hero-actions reveal">
+            <a class="btn btn-primary" href="#projects">看看我的作品</a>
+            <a class="btn btn-ghost" href="#contact">联系我</a>
+          </div>
+        </div>
+
+        <div class="hero-art reveal" aria-hidden="true">
+          <!-- 手绘风萤火虫吉祥物 -->
+         
+            <defs>
+              <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#ffe27a" stop-opacity="0.55" />
+                <stop offset="100%" stop-color="#ffe27a" stop-opacity="0" />
+              </radialGradient>
+              <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fff3b8" />
+                <stop offset="100%" stop-color="#ffe27a" />
+              </linearGradient>
+            </defs>
+            <circle cx="160" cy="160" r="118" fill="url(#glow)" />
+            <ellipse cx="88" cy="132" rx="34" ry="24" fill="#cfe4ff" opacity="0.85"
+                     transform="rotate(-24 88 132)" />
+            <ellipse cx="232" cy="132" rx="34" ry="24" fill="#cfe4ff" opacity="0.85"
+                     transform="rotate(24 232 132)" />
+            <ellipse cx="70" cy="172" rx="26" ry="18" fill="#d5f5ff" opacity="0.75"
+                     transform="rotate(-40 70 172)" />
+            <ellipse cx="250" cy="172" rx="26" ry="18" fill="#d5f5ff" opacity="0.75"
+                     transform="rotate(40 250 172)" />
+            <ellipse cx="160" cy="182" rx="52" ry="60" fill="url(#bodyGrad)"
+                     stroke="#f2c94c" stroke-width="3" />
+            <path d="M140 118 Q128 92 108 92" fill="none" stroke="#b06f2a" stroke-width="4" stroke-linecap="round" />
+            <path d="M180 118 Q192 92 212 92" fill="none" stroke="#b06f2a" stroke-width="4" stroke-linecap="round" />
+            <circle cx="106" cy="91" r="5" fill="#f2c94c" />
+            <circle cx="214" cy="91" r="5" fill="#f2c94c" />
+            <ellipse cx="142" cy="172" rx="10" ry="13" fill="#3a2b1d" />
+            <ellipse cx="178" cy="172" rx="10" ry="13" fill="#3a2b1d" />
+            <circle cx="146" cy="167" r="3.6" fill="#fff" />
+            <circle cx="182" cy="167" r="3.6" fill="#fff" />
+            <ellipse cx="122" cy="192" rx="8" ry="5" fill="#ff9eb5" opacity="0.7" />
+            <ellipse cx="198" cy="192" rx="8" ry="5" fill="#ff9eb5" opacity="0.7" />
+            <path d="M150 196 Q160 206 170 196" fill="none" stroke="#3a2b1d" stroke-width="3.5" stroke-linecap="round" />
+            <circle cx="104" cy="238" r="3" fill="#fff7c4" />
+            <circle cx="216" cy="244" r="2.4" fill="#fff7c4" />
+            <circle cx="236" cy="216" r="2" fill="#fff7c4" />
+          </svg>
+        </div>
+      </div>
+      <a class="scroll-hint" href="#about" aria-label="向下滚动">↓</a>
+    </section>
+
+    <!-- ============ 关于我 ============ -->
+    <section id="about" class="section">
+      <div class="container">
+        <h2 class="section-title reveal">关于我 <span class="deco">✦</span></h2>
+
+        <div class="about-card glass reveal">
+          <div class="about-avatar">
+            <div class="avatar-ring"><img src="assets/avatar.jpg" alt="萨姆萤光灯的B站头像" /></div>
+          </div>
+          <div class="about-body">
+            <h3>Hi！我是萨姆萤光灯</h3>
+            <p>一只高三萤厨，只做流萤翻唱的小 up 主。</p>
+            <p>目前正在备考，翻唱作品会陆续更新～</p>
+            <ul class="about-tags">
+              <li>萤厨</li>
+              <li>流萤翻唱</li>
+              <li>高三</li>
+              <li>B站 up</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 项目作品 ============ -->
+    <section id="projects" class="section">
+      <div class="container">
+        <h2 class="section-title reveal">我的作品 <span class="deco">✦</span></h2>
+
+        <div class="project-grid">
+          <article class="project-card glass reveal">
+            <div class="project-icon">🎵</div>
+            <h3>2025 流萤翻唱合集</h3>
+            <p>代表作。2025 年的流萤翻唱作品合集，欢迎去 B 站支持～</p>
+            <div class="project-tags"><span>翻唱</span><span>Bilibili</span><span>2025</span></div>
+            <a class="project-link" href="https://www.bilibili.com/video/BV1MnvDByEfw/?spm_id_from=333.1387.homepage.video_card.click&vd_source=770425f63a50bc6acf99723bc86ccd86" target="_blank" rel="noopener">去 B 站观看 →</a>
+          </article>
+
+          <article class="project-card glass reveal">
+            <div class="project-icon">🎧</div>
+            <h3>2026 流萤翻唱合集</h3>
+            <p>制作中，敬请期待～</p>
+            <div class="project-tags"><span>翻唱</span><span>制作中</span><span>2026</span></div>
+            <span class="project-link project-link-soon">敬请期待 ✨</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 联系方式 ============ -->
+    <section id="contact" class="section">
+      <div class="container">
+        <h2 class="section-title reveal">联系我 <span class="deco">✦</span></h2>
+
+        <div class="contact-grid">
+          <a class="contact-card glass reveal" href="https://space.bilibili.com/669867138" target="_blank" rel="noopener">
+            <span class="contact-icon">📺</span>
+            <span class="contact-name">B站主页</span>
+            <span class="contact-value">萨姆萤光灯</span>
+          </a>
+          <div class="contact-card glass reveal">
+            <span class="contact-icon">🦋</span>
+            <span class="contact-name">粉丝群 / 萤厨群</span>
+            <span class="contact-value">QQ群：716454006</span>
+          </div>
+          <a class="contact-card glass reveal" href="tencent://message/?uin=2946297906&Site=qq&Menu=yes">
+            <span class="contact-icon">💬</span>
+            <span class="contact-name">QQ</span>
+            <span class="contact-value">2946297906（注明来意）</span>
+          </a>
+          <a class="contact-card glass reveal" href="mailto:samlamp@126.com">
+            <span class="contact-icon">📧</span>
+            <span class="contact-name">Email</span>
+            <span class="contact-value">samlamp@126.com</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="year"></span> 萨姆萤光灯</p>
+  </footer>
+
+  <script src="bg-realtime.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
