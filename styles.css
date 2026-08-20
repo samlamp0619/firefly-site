@@ -420,6 +420,90 @@ main, header, footer { position: relative; z-index: 3; }
   color: var(--ink);
 }
 
+/* ===== 公告 ===== */
+.notice-list {
+  display: grid;
+  gap: 20px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.notice-card {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 26px 28px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.notice-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 48px rgba(31, 158, 146, 0.22);
+}
+
+.notice-card.warn {
+  background: rgba(255, 249, 230, 0.85);
+  border-color: rgba(255, 209, 102, 0.65);
+}
+
+.notice-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  background: linear-gradient(140deg, #e7faf5, #e9f7f3);
+  box-shadow: inset 0 0 0 2px #fff;
+}
+
+.notice-card.warn .notice-icon {
+  background: linear-gradient(140deg, #fff7e0, #fff3d6);
+}
+
+.notice-body h3 {
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  margin-bottom: 6px;
+}
+
+.notice-body p {
+  color: var(--ink-soft);
+  font-size: 0.94rem;
+}
+
+.notice-links {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.notice-links a {
+  font-weight: 700;
+  color: var(--purple);
+  font-size: 0.94rem;
+  transition: letter-spacing 0.25s;
+}
+
+.notice-links a:hover { letter-spacing: 0.05em; }
+
+.notice-pwd {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px dashed rgba(31, 158, 146, 0.4);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+@media (max-width: 560px) {
+  .notice-card { flex-direction: column; }
+}
+
 /* ===== 项目作品 ===== */
 .project-grid {
   display: grid;
