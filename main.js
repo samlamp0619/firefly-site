@@ -303,7 +303,7 @@
   /* ================= 导航：滚动高亮 + 毛玻璃 ================= */
   const header = document.getElementById("site-header");
   const navLinks = document.querySelectorAll(".nav-links a");
-  const sections = ["hero", "about", "notice", "projects", "contact"].map(id => document.getElementById(id));
+  const sections = ["hero", "about", "notice", "resources", "projects", "contact", "survey"].map(id => document.getElementById(id));
 
   function onScroll() {
     header.classList.toggle("scrolled", window.scrollY > 20);
