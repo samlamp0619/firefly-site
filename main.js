@@ -354,6 +354,43 @@
   /* ================= 页脚年份 ================= */
   document.getElementById("year").textContent = new Date().getFullYear();
 
+  /* ================= 访客统计（不蒜子）健壮性 ================= */
+  // 不蒜子脚本加载后会自动填充 busuanzi_value_site_uv / busuanzi_value_site_pv；
+  // 这里做轮询兜底：拿到数值就补千分位，超时未加载则降级为提示文案。
+  (() => {
+    const uvEl = document.getElementById("busuanzi_value_site_uv");
+    const pvEl = document.getElementById("busuanzi_value_site_pv");
+    const line = document.getElementById("vc-line");
+    const fb = document.getElementById("vc-fallback");
+    if (!uvEl && !pvEl) return;
+
+    const ready = () => [uvEl, pvEl].every(el =>
+      !el || (el.textContent && el.textContent.trim() && el.textContent !== "···"));
+
+    const fmt = el => {
+      if (!el || !el.textContent) return;
+      const n = parseInt(el.textContent.replace(/[^\d]/g, ""), 10);
+      if (!isNaN(n) && String(n) !== el.textContent) {
+        el.textContent = n.toLocaleString("zh-CN");
+      }
+    };
+
+    const start = Date.now();
+    (function poll() {
+      if (ready()) {
+        fmt(uvEl);
+        fmt(pvEl);
+        return;
+      }
+      if (Date.now() - start > 8000) {
+        if (line) line.hidden = true;
+        if (fb) fb.hidden = false;
+        return;
+      }
+      setTimeout(poll, 800);
+    })();
+  })();
+
   restartCarousel();
   initFx();
   onScroll();

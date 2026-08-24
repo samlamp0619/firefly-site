@@ -714,6 +714,26 @@ a.contact-card:hover {
   font-size: 0.92rem;
 }
 
+/* 访客统计（不蒜子） */
+.visit-counter {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: rgba(55, 81, 76, 0.6);
+  letter-spacing: 0.02em;
+}
+
+.visit-counter .vc-icon { margin-right: 2px; }
+
+.visit-counter b {
+  font-weight: 700;
+  color: var(--purple);
+  padding: 0 2px;
+}
+
+.visit-counter .vc-sep { margin: 0 6px; opacity: 0.55; }
+
+.visit-counter .vc-fallback { font-size: 0.78rem; opacity: 0.7; }
+
 /* ===== 滚动显现动画 ===== */
 .reveal {
   opacity: 0;

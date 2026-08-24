@@ -1,0 +1,2 @@
+# 本地 exe 启动器（由 firefly-launcher/build.ps1 生成），不进仓库
+*.exe
