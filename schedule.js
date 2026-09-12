@@ -4,18 +4,20 @@
  *   计划日期 < 今天  → 灰色（已过）
  *   计划日期 = 今天  → 黄色（就是今天）
  *   计划日期 > 今天  → 绿色（待发稿）
+ * 已发稿的歌在 link 里填 B 站视频地址，歌曲名就会变成可点击的直链；
+ * 还没发的歌留空字符串，显示为普通文字。
  * 数据来源：26.09发稿计划.xlsx
  */
 (() => {
   "use strict";
 
   const SCHEDULE = [
-    { date: "2026-09-04", song: "爱你是我的秘密", singer: "庄淇玟（29#）", submitter: "" },
-    { date: "2026-09-11", song: "认真的雪",       singer: "薛之谦",        submitter: "月寻" },
-    { date: "2026-09-18", song: "与花逝去的我",   singer: "归尘回梦",      submitter: "" },
-    { date: "2026-09-24", song: "我是如此相信",   singer: "周杰伦",        submitter: "甲鱼心不是鱼" },
-    { date: "2026-09-26", song: "交缠舞步",       singer: "三Z-STUDIO/HOYO-MIX", submitter: "" },
-    { date: "2026-09-30", song: "NIGHT DANCER",   singer: "imase",         submitter: "猫妖无忧" },
+    { date: "2026-09-04", song: "爱你是我的秘密", singer: "庄淇玟（29#）", submitter: "", link: "" },
+    { date: "2026-09-11", song: "认真的雪",       singer: "薛之谦",        submitter: "月寻", link: "" },
+    { date: "2026-09-18", song: "与花逝去的我",   singer: "归尘回梦",      submitter: "", link: "" },
+    { date: "2026-09-24", song: "我是如此相信",   singer: "周杰伦",        submitter: "甲鱼心不是鱼", link: "" },
+    { date: "2026-09-26", song: "交缠舞步",       singer: "三Z-STUDIO/HOYO-MIX", submitter: "", link: "" },
+    { date: "2026-09-30", song: "NIGHT DANCER",   singer: "imase",         submitter: "猫妖无忧", link: "" },
   ];
 
   const WEEK = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
@@ -35,6 +37,11 @@
     ));
   }
 
+  /* 只放行 http(s) 链接，避免数据被改坏时注入 javascript: 之类 */
+  function safeUrl(url) {
+    return /^https?:\/\//i.test(String(url || "")) ? String(url) : "";
+  }
+
   /* 2026-09-04 -> { md: "9月4日", wd: "周五" } */
   function dateParts(iso) {
     const [y, m, d] = iso.split("-").map(Number);
@@ -45,6 +52,15 @@
     if (iso < today) return "past";
     if (iso === today) return "today";
     return "future";
+  }
+
+  /* 有 B 站直链就渲染成可点击的歌曲名，否则是普通文字 */
+  function songCell(item) {
+    const url = safeUrl(item.link);
+    const name = esc(item.song);
+    if (!url) return name;
+    return '<a class="sched-link" href="' + esc(url) + '" target="_blank" rel="noopener"' +
+      ' title="去 B 站看这期翻唱">' + name + '<span class="sched-link-mark">B站 ↗</span></a>';
   }
 
   function render() {
@@ -62,7 +78,7 @@
           '<span class="sched-date">' + md + '<em>' + wd + '</em></span>' +
           '<span class="sched-tag">' + TAG[state] + '</span>' +
         '</td>' +
-        '<td class="sched-cell-song" data-label="歌曲">' + esc(item.song) + '</td>' +
+        '<td class="sched-cell-song" data-label="歌曲">' + songCell(item) + '</td>' +
         '<td class="sched-cell-singer" data-label="原唱">' + esc(item.singer) + '</td>' +
         '<td class="sched-cell-submitter" data-label="投稿人">' +
           (item.submitter ? esc(item.submitter) : '<span class="sched-empty">—</span>') +

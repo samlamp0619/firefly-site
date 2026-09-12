@@ -548,40 +548,6 @@ main, header, footer { position: relative; z-index: 3; }
   padding: 24px 22px 18px;
 }
 
-.schedule-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 18px;
-}
-
-.sched-chip {
-  font-size: 0.78rem;
-  padding: 4px 14px;
-  border-radius: 999px;
-  border: 1.5px solid transparent;
-  white-space: nowrap;
-}
-
-.sched-chip.is-past {
-  background: rgba(139, 152, 149, 0.18);
-  border-color: rgba(139, 152, 149, 0.5);
-  color: #6c7c79;
-}
-
-.sched-chip.is-today {
-  background: rgba(255, 209, 102, 0.38);
-  border-color: rgba(226, 168, 0, 0.55);
-  color: #8a6410;
-}
-
-.sched-chip.is-future {
-  background: rgba(64, 186, 108, 0.18);
-  border-color: rgba(64, 186, 108, 0.5);
-  color: #2b7a4b;
-}
-
 .schedule-table-wrap {
   border-radius: 18px;
   overflow: hidden;
@@ -667,6 +633,31 @@ main, header, footer { position: relative; z-index: 3; }
 }
 
 .sched-cell-song { font-weight: 700; }
+
+/* 已发稿：歌曲名是去 B 站的直链 */
+.sched-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  transition: opacity 0.25s ease;
+}
+
+.sched-link:hover { opacity: 0.72; }
+
+.sched-link-mark {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  vertical-align: middle;
+}
 
 .sched-cell-submitter { font-weight: 500; }
 
