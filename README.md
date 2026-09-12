@@ -12,6 +12,7 @@ personal-website/
 ├── index.html        # 页面结构与全部内容
 ├── styles.css        # 全部样式（青绿色主题）
 ├── main.js           # 背景轮播、实时刷新、只看实时开关、粒子、导航、动画
+├── schedule.js       # 「发稿计划」表格数据 + 按日期自动着色
 ├── bg-realtime.js    # 实时背景池（由 refresh_bg.py 生成，勿手改）
 ├── refresh_bg.py     # 实时拉取 Pixiv 镜像流萤图的刷新脚本
 ├── assets/
@@ -88,6 +89,19 @@ personal-website/
 ## 修改文案
 
 所有文字都在 `index.html` 里，直接搜索替换：标题（`<title>` / `.logo` / `hero h1`）、自我介绍（`#about`）、作品卡片（`#projects`）、联系方式（`#contact`）。
+
+## 维护「发稿计划」表格（`#schedule`）
+
+排期数据在 `schedule.js` 顶部的 `SCHEDULE` 数组里，一行一首歌，改完存盘刷新即生效：
+
+```js
+{ date: "2026-09-04", song: "爱你是我的秘密", singer: "庄淇玟（29#）", submitter: "" },
+```
+
+- `date` 必须是 `YYYY-MM-DD`（补零），`submitter` 留空会显示为「—」。
+- 行颜色按**浏览器本地日期**与 `date` 自动比较：早于今天=**灰**、等于今天=**黄**、晚于今天=**绿**，无需手动维护状态。
+- 页面跨零点仍开着时，每分钟自动复查一次日期并重新着色。
+- 窄屏（≤600px）下表格会自动变成卡片式排版，不用额外处理。
 
 ## 自定义主题色
 
