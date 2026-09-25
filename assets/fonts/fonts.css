@@ -1,0 +1,9 @@
+/* 标题字体子集：由 build_font.py 生成，请勿手改。
+   只含本站用到的字，所以只有几十 KB；改完文案重跑 py -3 build_font.py 即可。 */
+@font-face {
+  font-family: 'ZCOOL KuaiLe';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('zcool-kuaile-subset.woff2') format('woff2');
+}

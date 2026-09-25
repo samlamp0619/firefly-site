@@ -6,11 +6,11 @@
 
   /* ================= 背景图：实时池 + 本地兜底 + 只看实时开关 ================= */
   const LOCAL_BG = [
-    { url: "assets/bg/bg-140591786.png", credit: "背景 © Pixiv 140591786" },
-    { url: "assets/bg/bg-144019913.png", credit: "背景 © Pixiv 144019913「春日手信」" },
+    { url: "assets/bg/bg-140591786.jpg", credit: "背景 © Pixiv 140591786" },
+    { url: "assets/bg/bg-144019913.jpg", credit: "背景 © Pixiv 144019913「春日手信」" },
     { url: "assets/bg/bg-139886638.jpg", credit: "背景 © Pixiv 139886638「萤涟蝶梦」" },
-    { url: "assets/bg/bg-143979655.png", credit: "背景 © Pixiv 143979655" },
-    { url: "assets/bg/bg-141185006.png", credit: "背景 © Pixiv 141185006" },
+    { url: "assets/bg/bg-143979655.jpg", credit: "背景 © Pixiv 143979655" },
+    { url: "assets/bg/bg-141185006.jpg", credit: "背景 © Pixiv 141185006" },
   ];
 
   // 由 refresh_bg.py 生成的实时图（bg-realtime.js 注入），file:// 打开也兼容
@@ -44,11 +44,10 @@
   const creditEl = document.getElementById("bg-credit");
   const refreshBtn = document.getElementById("bg-refresh");
 
-  let loadedIdx = [];   // pool 中已成功预载的下标
-  let pos = 0;
+  let cur = 0;          // 当前显示的是池里第几张
   let layerTurn = 0;
-  let shown = false;
   let timer = null;
+  let loadToken = 0;    // 重建轮播时自增，用来作废还在路上的旧回调
 
   function activate(idx) {
     const it = pool[idx];
@@ -62,46 +61,54 @@
     layerTurn++;
   }
 
-  function startTimer() {
-    if (timer || reduceMotion) return;
-    timer = setInterval(() => {
-      if (loadedIdx.length === 0) return;
-      pos = (pos + 1) % loadedIdx.length;
-      activate(loadedIdx[pos]);
-    }, 8000);
-  }
-
-  function showFirst() {
-    if (shown) return;
-    shown = true;
-    if (loadedIdx.length === 0) return; // 全部失败则保持渐变底
-    carousel.classList.add("ready");
-    activate(loadedIdx[0]);
-    startTimer();
-  }
-
-  function preloadAndShow() {
-    loadedIdx = [];
-    pool.forEach((it, i) => {
+  /* 按需加载：一次只取「要显示的那张」，显示成功后再预取下一张。
+     以前是开局把整个池子（十几张、几十 MB）全部 Image() 拉下来，
+     手机流量用户会被直接劝退。 */
+  function loadImage(url) {
+    return new Promise(resolve => {
       const img = new Image();
-      img.onload = () => { loadedIdx.push(i); showFirst(); };
-      img.onerror = () => { /* 加载失败的图自动跳过 */ };
-      img.src = it.url;
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = url;
     });
-    // 保险：3 秒内还没显示第一张也直接尝试
-    setTimeout(() => {
-      if (shown) return;
-      shown = true;
-      const first = loadedIdx.length ? loadedIdx[0] : 0;
-      carousel.classList.add("ready");
-      activate(first);
-      startTimer();
-    }, 3000);
+  }
+
+  function prefetchNext() {
+    if (pool.length < 2) return;
+    const img = new Image();
+    img.src = pool[(cur + 1) % pool.length].url;   // 丢给浏览器缓存，轮到时基本秒开
+  }
+
+  async function showAt(idx) {
+    const token = ++loadToken;
+    const n = pool.length;
+    for (let k = 0; k < n; k++) {          // 坏图自动顺延到下一张
+      const i = (idx + k) % n;
+      const ok = await loadImage(pool[i].url);
+      if (token !== loadToken) return;      // 期间被 restartCarousel 作废了
+      if (ok) {
+        cur = i;
+        carousel.classList.add("ready");
+        activate(i);
+        startTimer();
+        prefetchNext();
+        return;
+      }
+    }
+    /* 整池都加载失败：保持渐变底，不报错 */
+  }
+
+  function startTimer() {
+    if (timer || reduceMotion || pool.length < 2) return;
+    timer = setInterval(() => {
+      showAt((cur + 1) % pool.length);
+    }, 8000);
   }
 
   // 按当前开关状态重建轮播
   function restartCarousel() {
-    pos = 0; layerTurn = 0; shown = false;
+    cur = 0; layerTurn = 0;
+    loadToken++;                            // 作废在途回调
     if (timer) { clearInterval(timer); timer = null; }
     pool = currentPool();
     if (pool.length === 0) {
@@ -110,7 +117,7 @@
       if (creditEl) creditEl.textContent = rtOnly ? "暂无实时图，运行 refresh_bg.py 或点「换一批」" : "";
       return;
     }
-    preloadAndShow();
+    showAt(0);
   }
 
   // 开关事件
@@ -171,7 +178,7 @@
       restartCarousel();
       if (creditEl) creditEl.textContent = "已刷新 ✓";
       setTimeout(() => {
-        if (creditEl && loadedIdx.length) creditEl.textContent = pool[loadedIdx[0]].credit || "";
+        if (creditEl && pool[cur]) creditEl.textContent = pool[cur].credit || "";
       }, 1800);
     } else if (creditEl) {
       creditEl.textContent = rtOnly
@@ -303,7 +310,7 @@
   /* ================= 导航：滚动高亮 + 毛玻璃 ================= */
   const header = document.getElementById("site-header");
   const navLinks = document.querySelectorAll(".nav-links a");
-  const sections = ["hero", "about", "notice", "schedule", "resources", "projects", "contact", "survey"].map(id => document.getElementById(id));
+  const sections = ["hero", "about", "notice", "schedule", "resources", "projects", "follow", "contact", "survey"].map(id => document.getElementById(id));
 
   function onScroll() {
     header.classList.toggle("scrolled", window.scrollY > 20);
@@ -350,6 +357,39 @@
   } else {
     revealEls.forEach(el => el.classList.add("visible"));
   }
+
+  /* ================= 深色 / 浅色主题切换 ================= */
+  (() => {
+    const btn = document.getElementById("theme-toggle");
+    if (!btn) return;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function apply(theme, remember) {
+      document.documentElement.setAttribute("data-theme", theme);
+      btn.textContent = theme === "dark" ? "☀️" : "🌙";
+      btn.title = theme === "dark" ? "切换到浅色" : "切换到深色";
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute("content", theme === "dark" ? "#0d181c" : "#fdf2ff");
+      if (remember) { try { localStorage.setItem("theme", theme); } catch {} }
+    }
+
+    // 与 <head> 里的内联脚本保持一致（它已经定过 data-theme 了）
+    apply(document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light", false);
+
+    btn.addEventListener("click", () => {
+      const now = document.documentElement.getAttribute("data-theme");
+      apply(now === "dark" ? "light" : "dark", true);
+    });
+
+    // 用户没手动选过时，跟随系统切换
+    const onSystemChange = e => {
+      let saved = null;
+      try { saved = localStorage.getItem("theme"); } catch {}
+      if (!saved) apply(e.matches ? "dark" : "light", false);
+    };
+    if (mq.addEventListener) mq.addEventListener("change", onSystemChange);
+    else if (mq.addListener) mq.addListener(onSystemChange);
+  })();
 
   /* ================= 页脚年份 ================= */
   document.getElementById("year").textContent = new Date().getFullYear();

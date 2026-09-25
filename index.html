@@ -7,10 +7,24 @@
   <meta name="description" content="一只高三萤厨，只做流萤翻唱的小 up 主。" />
   <meta name="theme-color" content="#fdf2ff" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <!-- 标题字体：自托管子集，不再依赖 fonts.googleapis.com（国内会超时且阻塞渲染）。
+       正文用系统中文字体（苹方 / 微软雅黑），不再下载几 MB 的 Noto Sans SC。 -->
+  <link rel="stylesheet" href="assets/fonts/fonts.css" />
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- 主题：本地记忆优先，否则跟随系统。必须放在 <head> 内联执行，
+       否则深色模式下会先闪一下白底再变暗。 -->
+  <script>
+    (function () {
+      var dark = false;
+      try {
+        var saved = localStorage.getItem("theme");
+        dark = saved ? saved === "dark"
+                     : window.matchMedia("(prefers-color-scheme: dark)").matches;
+      } catch (e) { /* 无 localStorage 时按浅色走 */ }
+      document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    })();
+  </script>
 </head>
 <body>
   <!-- 背景图轮播 -->
@@ -27,6 +41,7 @@
       <span class="rt-label">只看实时</span>
     </label>
     <button type="button" id="bg-refresh" title="从 Pixiv 镜像实时拉取新背景图">🔄 换一批</button>
+    <button type="button" class="theme-toggle" id="theme-toggle" title="切换深色 / 浅色" aria-label="切换深色或浅色主题">🌙</button>
   </div>
 
   <!-- 背景粒子画布：樱花 + 萤火虫 -->
