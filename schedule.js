@@ -12,10 +12,10 @@
   "use strict";
 
   const SCHEDULE = [
-    { date: "2026-09-04", song: "爱你是我的秘密", singer: "庄淇玟（29#）", submitter: "", link: "" },
-    { date: "2026-09-11", song: "认真的雪",       singer: "薛之谦",        submitter: "月寻", link: "" },
-    { date: "2026-09-18", song: "与花逝去的我",   singer: "归尘回梦",      submitter: "", link: "" },
-    { date: "2026-09-24", song: "我是如此相信",   singer: "周杰伦",        submitter: "甲鱼心不是鱼", link: "" },
+    { date: "2026-09-04", song: "爱你是我的秘密", singer: "庄淇玟（29#）", submitter: "", link: "https://www.bilibili.com/video/BV1pEtB6QEfP" },
+    { date: "2026-09-11", song: "认真的雪",       singer: "薛之谦",        submitter: "月寻", link: "https://www.bilibili.com/video/BV1eHY76oE4T" },
+    { date: "2026-09-18", song: "与花逝去的我",   singer: "归尘回梦",      submitter: "", link: "https://www.bilibili.com/video/BV1Evem6WE6W" },
+    { date: "2026-09-24", song: "我是如此相信",   singer: "周杰伦",        submitter: "甲鱼心不是鱼", link: "https://www.bilibili.com/video/BV1ucaK6UEXL" },
     { date: "2026-09-26", song: "交缠舞步",       singer: "三Z-STUDIO/HOYO-MIX", submitter: "", link: "" },
     { date: "2026-09-30", song: "NIGHT DANCER",   singer: "imase",         submitter: "猫妖无忧", link: "" },
   ];

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>页面飞丢了 · 萨姆萤光灯</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#fdf2ff" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>" />
+  <!--
+    这一页刻意不引 styles.css：GitHub Pages 对任意不存在的路径都会返回 404.html，
+    相对路径（styles.css）会按“用户请求的那个目录”去解析，多一层目录就全失效。
+    所以这里把样式内联，保证在任何路径下都长得一样。
+  -->
+  <style>
+    :root {
+      --ink: #37514c;
+      --ink-soft: #6d8983;
+      --pink: #2ec4b6;
+      --purple: #1f9e92;
+      --amber: #ffd166;
+      --font-body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: linear-gradient(160deg, #eafaf5 0%, #f0fbf7 45%, #e9f6f2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      line-height: 1.75;
+    }
+    .wrap { width: min(560px, 100%); text-align: center; }
+    .card {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      border-radius: 26px;
+      box-shadow: 0 18px 48px rgba(31, 158, 146, 0.16);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 48px 34px 42px;
+    }
+    .firefly {
+      font-size: 2.6rem;
+      line-height: 1;
+      animation: floaty 3.4s ease-in-out infinite;
+    }
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .code {
+      font-size: clamp(3.4rem, 15vw, 5.4rem);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      background: linear-gradient(100deg, #1f9e92 0%, #2ec4b6 45%, #7ed6c9 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1.1;
+      margin: 6px 0 2px;
+    }
+    h1 { font-size: 1.3rem; margin-bottom: 10px; }
+    p { color: var(--ink-soft); font-size: 0.95rem; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 26px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 26px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.96rem;
+      text-decoration: none;
+      transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+    }
+    .btn:hover { transform: translateY(-3px); }
+    .btn-primary {
+      background: linear-gradient(120deg, var(--purple), var(--pink));
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(46, 196, 182, 0.4);
+    }
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--purple);
+      border: 2px solid rgba(31, 158, 146, 0.45);
+    }
+    .btn-ghost:hover { background: #fff; }
+    @media (prefers-reduced-motion: reduce) {
+      .firefly { animation: none; }
+      .btn { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="firefly" aria-hidden="true">✨</div>
+      <div class="code">404</div>
+      <h1>这只萤火虫飞丢了</h1>
+      <p>你要找的页面不存在，或者已经被搬走了～</p>
+
+      <div class="actions">
+        <a class="btn btn-primary" id="home-link" href="/">回到首页</a>
+        <a class="btn btn-ghost" href="https://space.bilibili.com/669867138" target="_blank" rel="noopener">去 B 站看我</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* 站点可能部署在 https://用户.github.io/仓库名/ 这种子目录下，
+       此时 href="/" 会跳到域名根而不是站点首页，所以按首个路径段推算。 */
+    (function () {
+      try {
+        var seg = location.pathname.split("/").filter(Boolean)[0];
+        document.getElementById("home-link").href = seg ? "/" + seg + "/" : "/";
+      } catch (e) { /* 保持默认 href="/" */ }
+    })();
+  </script>
+</body>
+</html>

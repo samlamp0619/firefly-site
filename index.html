@@ -70,50 +70,12 @@
         <div class="hero-text">
           <h1 class="reveal">萨姆萤光灯</h1>
           <div class="hero-actions reveal">
-            <a class="btn btn-primary" href="#projects">看看我的作品</a>
+            <a class="btn btn-bili" href="https://space.bilibili.com/669867138" target="_blank" rel="noopener">
+              <span class="btn-bili-icon">📺</span>去 B 站关注我
+            </a>
+            <a class="btn btn-ghost" href="#projects">看看我的作品</a>
             <a class="btn btn-ghost" href="#contact">联系我</a>
           </div>
-        </div>
-
-        <div class="hero-art reveal" aria-hidden="true">
-          <!-- 手绘风萤火虫吉祥物 -->
-         
-            <defs>
-              <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#ffe27a" stop-opacity="0.55" />
-                <stop offset="100%" stop-color="#ffe27a" stop-opacity="0" />
-              </radialGradient>
-              <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#fff3b8" />
-                <stop offset="100%" stop-color="#ffe27a" />
-              </linearGradient>
-            </defs>
-            <circle cx="160" cy="160" r="118" fill="url(#glow)" />
-            <ellipse cx="88" cy="132" rx="34" ry="24" fill="#cfe4ff" opacity="0.85"
-                     transform="rotate(-24 88 132)" />
-            <ellipse cx="232" cy="132" rx="34" ry="24" fill="#cfe4ff" opacity="0.85"
-                     transform="rotate(24 232 132)" />
-            <ellipse cx="70" cy="172" rx="26" ry="18" fill="#d5f5ff" opacity="0.75"
-                     transform="rotate(-40 70 172)" />
-            <ellipse cx="250" cy="172" rx="26" ry="18" fill="#d5f5ff" opacity="0.75"
-                     transform="rotate(40 250 172)" />
-            <ellipse cx="160" cy="182" rx="52" ry="60" fill="url(#bodyGrad)"
-                     stroke="#f2c94c" stroke-width="3" />
-            <path d="M140 118 Q128 92 108 92" fill="none" stroke="#b06f2a" stroke-width="4" stroke-linecap="round" />
-            <path d="M180 118 Q192 92 212 92" fill="none" stroke="#b06f2a" stroke-width="4" stroke-linecap="round" />
-            <circle cx="106" cy="91" r="5" fill="#f2c94c" />
-            <circle cx="214" cy="91" r="5" fill="#f2c94c" />
-            <ellipse cx="142" cy="172" rx="10" ry="13" fill="#3a2b1d" />
-            <ellipse cx="178" cy="172" rx="10" ry="13" fill="#3a2b1d" />
-            <circle cx="146" cy="167" r="3.6" fill="#fff" />
-            <circle cx="182" cy="167" r="3.6" fill="#fff" />
-            <ellipse cx="122" cy="192" rx="8" ry="5" fill="#ff9eb5" opacity="0.7" />
-            <ellipse cx="198" cy="192" rx="8" ry="5" fill="#ff9eb5" opacity="0.7" />
-            <path d="M150 196 Q160 206 170 196" fill="none" stroke="#3a2b1d" stroke-width="3.5" stroke-linecap="round" />
-            <circle cx="104" cy="238" r="3" fill="#fff7c4" />
-            <circle cx="216" cy="244" r="2.4" fill="#fff7c4" />
-            <circle cx="236" cy="216" r="2" fill="#fff7c4" />
-          </svg>
         </div>
       </div>
       <a class="scroll-hint" href="#about" aria-label="向下滚动">↓</a>
@@ -229,6 +191,11 @@
       <div class="container">
         <h2 class="section-title reveal">我的作品 <span class="deco">✦</span></h2>
 
+        <!-- 最新投稿：由 projects.js 读取 videos.js 渲染 -->
+        <div class="latest-card glass reveal" id="latest-card">
+          <p class="works-loading">最新投稿载入中…</p>
+        </div>
+
         <div class="project-grid">
           <article class="project-card glass reveal">
             <div class="project-icon">🎵</div>
@@ -245,6 +212,46 @@
             <div class="project-tags"><span>翻唱</span><span>制作中</span><span>2026</span></div>
             <span class="project-link project-link-soon">敬请期待 ✨</span>
           </article>
+        </div>
+
+        <!-- 全部投稿：自动同步自 B 站 -->
+        <div class="works-panel glass reveal" id="works-panel">
+          <div class="works-head">
+            <div class="works-stats" id="works-stats">投稿列表载入中…</div>
+            <label class="works-search">
+              <span class="works-search-icon" aria-hidden="true">🔍</span>
+              <input type="search" id="works-search" placeholder="搜歌名…" autocomplete="off" aria-label="搜索投稿歌名" />
+            </label>
+          </div>
+
+          <div class="works-tabs" id="works-tabs" role="tablist" aria-label="投稿分类"></div>
+
+          <div class="works-grid" id="works-grid"></div>
+
+          <p class="works-empty" id="works-empty" hidden>没有找到匹配的投稿，换个关键词试试～</p>
+
+          <div class="works-foot">
+            <button type="button" class="btn btn-ghost works-more" id="works-more" hidden>加载更多</button>
+            <p class="works-note">
+              共 <b id="works-total">0</b> 首投稿 · 列表由 <code>refresh_videos.py</code> 自动同步
+              <span id="works-updated"></span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 关注 CTA ============ -->
+    <section id="follow" class="section">
+      <div class="container">
+        <div class="cta-band glass reveal">
+          <div class="cta-text">
+            <h2>喜欢这些翻唱的话，来 B 站关注我吧 ✦</h2>
+            <p id="cta-followers">新投稿会第一时间出现在你的关注列表里～</p>
+          </div>
+          <a class="btn btn-bili" href="https://space.bilibili.com/669867138" target="_blank" rel="noopener">
+            <span class="btn-bili-icon">📺</span>去 B 站关注
+          </a>
         </div>
       </div>
     </section>
@@ -291,6 +298,8 @@
 
   <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
   <script src="bg-realtime.js"></script>
+  <script src="videos.js"></script>
+  <script src="projects.js"></script>
   <script src="schedule.js"></script>
   <script src="main.js"></script>
 </body>
