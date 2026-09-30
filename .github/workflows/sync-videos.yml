@@ -1,0 +1,54 @@
+# 定时把 B 站最新投稿同步进 videos.js。
+#
+# 为什么要这个：videos.js 是静态文件，以前只有本地手动跑 refresh_videos.py
+# 再 push 才会更新，所以网站上「最新投稿」和作品列表会一直停在旧数据。
+# 这个工作流每天自动跑一次，有变化就提交；提交会触发 EdgeOne 重新部署，
+# 整条链路全自动，不需要人管。
+#
+# 也可以随时在 Actions 页面点「Run workflow」手动跑一次。
+
+name: 同步 B 站投稿
+
+on:
+  schedule:
+    # 每天 02:17 UTC = 北京时间 10:17（避开整点，减少排队延迟）
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+# 需要写权限才能把 videos.js 提交回仓库
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取仓库
+        uses: actions/checkout@v4
+
+      - name: 准备 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 脚本只用标准库，不需要 pip install。
+      # 同步失败（比如 B 站风控）时脚本会保留现有 videos.js 不动，
+      # 所以这里只给个警告，不让整个任务变红。
+      - name: 同步投稿数据
+        run: |
+          if ! python refresh_videos.py; then
+            echo "::warning::B 站同步失败，已保留现有 videos.js（网站不受影响）"
+          fi
+
+      - name: 有变化才提交
+        run: |
+          if git diff --quiet -- videos.js; then
+            echo "videos.js 无变化，跳过提交"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add videos.js
+          git commit -m "chore: 自动同步 B 站投稿（$(date -u '+%Y-%m-%d %H:%M UTC')）"
+          git push
+          echo "已提交并推送，EdgeOne 会自动重新部署"

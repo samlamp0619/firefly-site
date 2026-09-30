@@ -97,6 +97,23 @@ def enc_wbi(params, img_key, sub_key):
     return params
 
 
+def parse_length(s):
+    """B 站空间接口的 length 是 "4:27" / "1:02:33" 这种字符串，不是秒数。
+    直接 int() 会失败——之前就因此把时长全写成了 0，页面上的时长角标全都不显示。"""
+    parts = str(s or "").strip().split(":")
+    try:
+        nums = [int(p) for p in parts]
+    except ValueError:
+        return 0
+    if len(nums) == 1:
+        return nums[0]
+    if len(nums) == 2:
+        return nums[0] * 60 + nums[1]
+    if len(nums) == 3:
+        return nums[0] * 3600 + nums[1] * 60 + nums[2]
+    return 0
+
+
 def fetch_space_videos():
     """来源 1：空间投稿列表（最新在前）。返回 list[dict]。"""
     img_key, sub_key = get_wbi_keys()
@@ -117,7 +134,7 @@ def fetch_space_videos():
             "bvid": v.get("bvid") or "",
             "title": (v.get("title") or "").strip(),
             "date": time.strftime("%Y-%m-%d", time.localtime(v.get("created") or 0)),
-            "duration": int(v.get("length") or 0) if str(v.get("length", "")).isdigit() else 0,
+            "duration": parse_length(v.get("length")),
             "views": v.get("play") or 0,
             "cover": v.get("pic") or "",
             "section": "",
