@@ -196,6 +196,12 @@ powershell -ExecutionPolicy Bypass -File optimize_bg.ps1
 4. 等 1~2 分钟，访问 `https://<你的用户名>.github.io/<仓库名>/` 即可。
 5. 以后更新内容：`git add . && git commit -m "xxx" && git push`，Pages 自动重新发布。
 
+> **本站当前已绑定自有域名 `samlamp.top`**（2026-09-30 起）。
+> 仓库根目录的 `CNAME` 文件就是它，内容一行 `samlamp.top`——**不要删**，删了 GitHub 就不再认这个域名。
+> 此时 `samlamp0619.github.io/firefly-site/` 会自动 301 跳到 `samlamp.top`，两个地址都能用。
+> DNS 在阿里云云解析：`@` 指向 4 个 GitHub Pages IP，`www` CNAME 到 `samlamp0619.github.io`。
+> 换域名时，除改 DNS 和 `CNAME` 外，记得同步改 `index.html` 里 4 处绝对地址（canonical + og:url + og:image + twitter:image）。
+
 ### 方案二：Netlify（免费，拖拽即上线，国内访问相对稳定）
 
 1. 打开 https://app.netlify.com/drop

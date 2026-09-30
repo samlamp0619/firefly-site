@@ -115,13 +115,26 @@
   </div>
 
   <script>
-    /* 站点可能部署在 https://用户.github.io/仓库名/ 这种子目录下，
-       此时 href="/" 会跳到域名根而不是站点首页，所以按首个路径段推算。 */
+    /* 「回到首页」该指向哪里。
+       难点：404 页面拿到的 location 是「访客请求的那个不存在的地址」，
+       所以不能拿它反推站点根目录。
+
+       这里按主机名判断，两种情况都自动正确：
+         · 用户.github.io/仓库名/  → 站点在子目录，首页是 /仓库名/
+         · 自己的域名（如 samlamp.top）→ 站点在根目录，首页是 /
+
+       如果以后部署方式特殊，把 FORCE_BASE 写成需要的值即可（如 "/blog/"）。 */
     (function () {
-      try {
-        var seg = location.pathname.split("/").filter(Boolean)[0];
-        document.getElementById("home-link").href = seg ? "/" + seg + "/" : "/";
-      } catch (e) { /* 保持默认 href="/" */ }
+      var FORCE_BASE = "";
+      var base = FORCE_BASE;
+      if (!base) {
+        base = /\.github\.io$/i.test(location.hostname)
+          ? "/" + (location.pathname.split("/").filter(Boolean)[0] || "") + "/"
+          : "/";
+      }
+      if (base.charAt(0) !== "/") base = "/" + base;
+      if (base.slice(-1) !== "/") base += "/";
+      document.getElementById("home-link").href = base;
     })();
   </script>
 </body>

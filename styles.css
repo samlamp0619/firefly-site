@@ -669,6 +669,16 @@ main, header, footer { position: relative; z-index: 3; }
 
 .sched-cell-submitter { font-weight: 500; }
 
+/* 串烧节目：在歌名下面附一行曲目清单 */
+.sched-medley {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.76rem;
+  font-weight: 400;
+  line-height: 1.5;
+  opacity: 0.72;
+}
+
 .sched-empty { opacity: 0.5; }
 
 .schedule-note {
