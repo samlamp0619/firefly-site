@@ -215,12 +215,30 @@ async function main() {
     return 0;
   }
 
+  // 合并优先级：仓库已有数据（打底）< 合集（补分类）< 空间列表（最新）
+  // 把「已有数据」也当成一层来源，是为了防止某个接口临时失败时
+  // 把已知的旧视频弄丢——只会少「新」的，不会丢「旧」的。
   const byBvid = new Map();
-  for (const v of spaceVideos) {
-    v.section = seasonSections[v.bvid] ?? v.section ?? "";
-    byBvid.set(v.bvid, v);
+  const existing = loadExisting();
+  for (const v of (existing && existing.videos) || []) {
+    if (v && v.bvid) byBvid.set(v.bvid, { ...v });
   }
-  for (const v of seasonVideos) if (!byBvid.has(v.bvid)) byBvid.set(v.bvid, v);
+  for (const v of seasonVideos) {
+    const prev = byBvid.get(v.bvid) || {};
+    byBvid.set(v.bvid, {
+      ...prev, ...v,
+      section: v.section || prev.section || "",
+      duration: v.duration || prev.duration || 0,
+    });
+  }
+  for (const v of spaceVideos) {
+    const prev = byBvid.get(v.bvid) || {};
+    byBvid.set(v.bvid, {
+      ...prev, ...v,
+      section: prev.section || v.section || seasonSections[v.bvid] || "",
+      duration: v.duration || prev.duration || 0,
+    });
+  }
 
   let merged = [...byBvid.values()].filter(v => v.bvid).map(v => ({
     ...v,
