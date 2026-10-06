@@ -1,6 +1,6 @@
 /* 本文件由同步脚本自动生成，请勿手改；重新同步：node refresh-videos.mjs 或 py -3 refresh_videos.py */
 window.BILI_VIDEOS = {
-  "updated": "2026-10-07 00:04",
+  "updated": "2026-10-07 00:11",
   "mid": "669867138",
   "space": "https://space.bilibili.com/669867138",
   "followers": 7464,
@@ -13,7 +13,7 @@ window.BILI_VIDEOS = {
       "title": "大鱼 流萤翻唱",
       "date": "2026-10-05",
       "duration": 314,
-      "views": 465,
+      "views": 466,
       "cover": "https://i0.hdslb.com/bfs/archive/5b5dc62cbefbbd7e19dc27bd3d2d3c4fa2a1db1b.jpg",
       "section": "其它",
       "url": "https://www.bilibili.com/video/BV1SdHx6jExA"
@@ -53,7 +53,7 @@ window.BILI_VIDEOS = {
       "title": "Two to Tango 流萤翻唱",
       "date": "2026-09-26",
       "duration": 247,
-      "views": 2859,
+      "views": 2860,
       "cover": "https://i1.hdslb.com/bfs/archive/8e40ae1943c0bf1779bf33dd714749015ca5f9ad.jpg",
       "section": "官方曲目",
       "url": "https://www.bilibili.com/video/BV1zRhD64Ee5"
@@ -63,7 +63,7 @@ window.BILI_VIDEOS = {
       "title": "我是如此相信 流萤翻唱",
       "date": "2026-09-24",
       "duration": 267,
-      "views": 1244,
+      "views": 1246,
       "cover": "https://i0.hdslb.com/bfs/archive/fec019ad8986648eac16f5c41f4071af1d48134b.jpg",
       "section": "其它",
       "url": "https://www.bilibili.com/video/BV1ucaK6UEXL"
@@ -83,7 +83,7 @@ window.BILI_VIDEOS = {
       "title": "认真的雪 流萤翻唱",
       "date": "2026-09-11",
       "duration": 256,
-      "views": 4853,
+      "views": 4854,
       "cover": "https://i2.hdslb.com/bfs/archive/21b893cae4ca30905f890f8bb13e2b4a841898bc.jpg",
       "section": "其它",
       "url": "https://www.bilibili.com/video/BV1eHY76oE4T"
@@ -100,7 +100,7 @@ window.BILI_VIDEOS = {
     },
     {
       "bvid": "BV1z4t462EiN",
-      "title": "【萤翻二周年】盛放 流萤翻唱",
+      "title": "盛放 流萤翻唱",
       "date": "2026-08-31",
       "duration": 153,
       "views": 1030,
@@ -280,7 +280,7 @@ window.BILI_VIDEOS = {
     },
     {
       "bvid": "BV1Pq3p6iENp",
-      "title": "流萤：我也要绷住吗",
+      "title": "[整活]轻松绷住 流萤翻唱",
       "date": "2026-07-30",
       "duration": 142,
       "views": 1532,
@@ -310,7 +310,7 @@ window.BILI_VIDEOS = {
     },
     {
       "bvid": "BV1Huga6XEG8",
-      "title": "来和流萤一起做一次仲夏之梦",
+      "title": "Summer Dream 流萤翻唱",
       "date": "2026-07-24",
       "duration": 217,
       "views": 1393,
@@ -340,7 +340,7 @@ window.BILI_VIDEOS = {
     },
     {
       "bvid": "BV1WpKB6YEhY",
-      "title": "下一站，但是流萤翻唱",
+      "title": "下一站 流萤翻唱",
       "date": "2026-07-19",
       "duration": 227,
       "views": 1065,
@@ -490,7 +490,7 @@ window.BILI_VIDEOS = {
     },
     {
       "bvid": "BV1cuJc6REtt",
-      "title": "「冥冥中，成为我的唯一」——致流萤：跨越终末结局，有你偕行",
+      "title": "嘉宾 流萤填翻",
       "date": "2026-06-19",
       "duration": 269,
       "views": 1651,
@@ -563,7 +563,7 @@ window.BILI_VIDEOS = {
       "title": "我好像在哪见过你 流萤翻唱",
       "date": "2026-05-04",
       "duration": 280,
-      "views": 2946,
+      "views": 2947,
       "cover": "https://i2.hdslb.com/bfs/archive/0270948067fb99fba4a93c8592a613a72f339b61.jpg",
       "section": "其它",
       "url": "https://www.bilibili.com/video/BV1T9ReB2EAC"
@@ -713,7 +713,7 @@ window.BILI_VIDEOS = {
       "title": "咏春 流萤翻唱",
       "date": "2026-02-25",
       "duration": 272,
-      "views": 9126,
+      "views": 9127,
       "cover": "https://i0.hdslb.com/bfs/archive/3889adc791ea319aa31e474ca892b6a1c2e409df.jpg",
       "section": "其它",
       "url": "https://www.bilibili.com/video/BV1J1fxB9EEm"
@@ -1043,7 +1043,7 @@ window.BILI_VIDEOS = {
       "title": "下次见 流萤翻唱",
       "date": "2025-10-17",
       "duration": 160,
-      "views": 3282,
+      "views": 3283,
       "cover": "https://i2.hdslb.com/bfs/archive/026e2ba65b6724a6ccdd406bf56aebc2ee948a10.jpg",
       "section": "其它",
       "url": "https://www.bilibili.com/video/BV1qZWEzfE9m"
@@ -1533,7 +1533,7 @@ window.BILI_VIDEOS = {
       "title": "晚夜微雨问海棠 流萤翻唱",
       "date": "2025-06-06",
       "duration": 284,
-      "views": 5014,
+      "views": 5015,
       "cover": "https://i1.hdslb.com/bfs/archive/e145f1be8e5250544ca0542e31b5e33c704c0800.jpg",
       "section": "其它",
       "url": "https://www.bilibili.com/video/BV1Y3TTzCErn"
