@@ -317,8 +317,9 @@
     <p>© <span id="year"></span> 萨姆萤光灯</p>
   </footer>
 
-  <!-- 访客统计：Vercount（不蒜子已停服，这是它的开源替代，会自动同步原有计数） -->
-  <script defer src="https://events.vercount.one/js"></script>
+  <!-- 访客统计：刻意不用 Vercount 的官方脚本——它把请求超时硬编码成 5 秒，
+       而它的接口从国内访问实测 1.4~5.3 秒，经常刚好被 abort，数字就填不上。
+       改由 main.js 直接调用计数接口（超时放宽到 12 秒 + 本地缓存）。 -->
   <script src="bg-realtime.js"></script>
   <script src="videos.js"></script>
   <script src="projects.js"></script>

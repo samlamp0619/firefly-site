@@ -394,11 +394,21 @@
   /* ================= 页脚年份 ================= */
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  /* ================= 访客统计（Vercount）健壮性 ================= */
-  // 用的服务是 Vercount（https://vercount.one），不蒜子的开源替代：
-  // 不蒜子已停服（原站 502），Vercount 兼容其用法，并会自动同步原有计数。
-  // 脚本加载后会填充 vercount_value_site_uv / vercount_value_site_pv；
-  // 这里做轮询兜底：拿到数值就补千分位，超时未加载则降级为提示文案。
+  /* ================= 访客统计 =================
+   * 服务用的是 Vercount（https://vercount.one），不蒜子的开源替代：
+   * 不蒜子已停服（原站 502），Vercount 兼容其用法。
+   *
+   * ⚠️ 这里刻意**不用 Vercount 的官方脚本**，原因是它把请求超时**硬编码成 5 秒**，
+   *    而它的 API 从国内访问实测要 1.4~5.3 秒（走 Cloudflare 海外边缘，
+   *    实测落在阿姆斯特丹 AMS），经常刚好被 abort，数字就永远填不上、
+   *    只剩「统计加载失败」。所以这里自己发请求：超时放宽到 12 秒，
+   *    并把上次拿到的数值缓存在 localStorage，回访时先秒显缓存再后台刷新。
+   *
+   * 接口（读官方脚本源码得到）：
+   *   POST https://events.vercount.one/api/v2/log
+   *   body   { url: 当前完整地址, isNewUv: 是否首次访问 }
+   *   返回   { status:"success", data:{ site_uv, site_pv, page_pv } }
+   * UV 用 cookie 去重，cookie 名与官方脚本一致，避免重复计数。 */
   (() => {
     const uvEl = document.getElementById("vercount_value_site_uv");
     const pvEl = document.getElementById("vercount_value_site_pv");
@@ -406,31 +416,74 @@
     const fb = document.getElementById("vc-fallback");
     if (!uvEl && !pvEl) return;
 
-    const ready = () => [uvEl, pvEl].every(el =>
-      !el || (el.textContent && el.textContent.trim() && el.textContent !== "···"));
+    const API = "https://events.vercount.one/api/v2/log";
+    const CACHE_KEY = "visitorCountData";   // 与官方脚本同名，便于互通
+    const TIMEOUT = 12000;
 
-    const fmt = el => {
-      if (!el || !el.textContent) return;
-      const n = parseInt(el.textContent.replace(/[^\d]/g, ""), 10);
-      if (!isNaN(n) && String(n) !== el.textContent) {
-        el.textContent = n.toLocaleString("zh-CN");
-      }
+    const fmtNum = n => Number(n).toLocaleString("zh-CN");
+
+    function paint(data) {
+      if (!data) return false;
+      const uv = Number(data.site_uv);
+      const pv = Number(data.site_pv);
+      if (!Number.isFinite(uv) && !Number.isFinite(pv)) return false;
+      if (uvEl) uvEl.textContent = fmtNum(Number.isFinite(uv) ? uv : 0);
+      if (pvEl) pvEl.textContent = fmtNum(Number.isFinite(pv) ? pv : 0);
+      if (line) line.hidden = false;
+      if (fb) fb.hidden = true;
+      return true;
+    }
+
+    const readCache = () => {
+      try {
+        const s = localStorage.getItem(CACHE_KEY);
+        return s ? JSON.parse(s) : null;
+      } catch { return null; }
     };
+    const writeCache = d => { try { localStorage.setItem(CACHE_KEY, JSON.stringify(d)); } catch {} };
 
-    const start = Date.now();
-    (function poll() {
-      if (ready()) {
-        fmt(uvEl);
-        fmt(pvEl);
-        return;
+    /* 与官方脚本同样的 cookie 名，保证 UV 去重口径一致 */
+    function isNewUv() {
+      const name = "vercount_uv_" + (location.host || "unknown-host").replace(/[^a-zA-Z0-9_-]/g, "_");
+      if (document.cookie.split("; ").some(c => c.startsWith(name + "="))) return false;
+      const exp = new Date(Date.now() + 31536000000).toUTCString();
+      document.cookie = name + "=1; path=/; expires=" + exp + "; samesite=lax";
+      return true;
+    }
+
+    async function fetchCount() {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), TIMEOUT);
+      try {
+        const r = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: location.href, isNewUv: isNewUv() }),
+          signal: ctrl.signal,
+        });
+        const j = await r.json();
+        return (j && j.data) || null;
+      } finally {
+        clearTimeout(timer);
       }
-      if (Date.now() - start > 8000) {
-        if (line) line.hidden = true;
-        if (fb) fb.hidden = false;
-        return;
-      }
-      setTimeout(poll, 800);
-    })();
+    }
+
+    function fail() {
+      if (line) line.hidden = true;
+      if (fb) fb.hidden = false;
+    }
+
+    // 回访：先显缓存，再后台刷新，数字是秒出的
+    const cached = readCache();
+    if (cached && paint(cached)) {
+      fetchCount().then(d => { if (d) { paint(d); writeCache(d); } }).catch(() => {});
+      return;
+    }
+
+    // 首次：等接口返回
+    fetchCount()
+      .then(d => { if (d && paint(d)) writeCache(d); else fail(); })
+      .catch(fail);
   })();
 
   restartCarousel();
