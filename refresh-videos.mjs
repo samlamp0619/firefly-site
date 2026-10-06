@@ -182,6 +182,9 @@ function loadExisting() {
 async function main() {
   console.log("=".repeat(52));
   console.log("  萨姆萤光灯 · 最新投稿同步（Node / EdgeOne 构建）");
+  // 打一行环境信息：构建日志里能直接看出 Node 版本和 fetch 是否可用
+  console.log("  Node " + process.version + " · fetch " +
+              (typeof fetch === "function" ? "可用" : "不可用（需要 Node 18+）"));
   console.log("=".repeat(52));
 
   let seasonVideos = [], seasonSections = {}, seasonTitle = "", seasonTotal = 0;
