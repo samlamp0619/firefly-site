@@ -394,12 +394,14 @@
   /* ================= 页脚年份 ================= */
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  /* ================= 访客统计（不蒜子）健壮性 ================= */
-  // 不蒜子脚本加载后会自动填充 busuanzi_value_site_uv / busuanzi_value_site_pv；
+  /* ================= 访客统计（Vercount）健壮性 ================= */
+  // 用的服务是 Vercount（https://vercount.one），不蒜子的开源替代：
+  // 不蒜子已停服（原站 502），Vercount 兼容其用法，并会自动同步原有计数。
+  // 脚本加载后会填充 vercount_value_site_uv / vercount_value_site_pv；
   // 这里做轮询兜底：拿到数值就补千分位，超时未加载则降级为提示文案。
   (() => {
-    const uvEl = document.getElementById("busuanzi_value_site_uv");
-    const pvEl = document.getElementById("busuanzi_value_site_pv");
+    const uvEl = document.getElementById("vercount_value_site_uv");
+    const pvEl = document.getElementById("vercount_value_site_pv");
     const line = document.getElementById("vc-line");
     const fb = document.getElementById("vc-fallback");
     if (!uvEl && !pvEl) return;

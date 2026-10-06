@@ -70,13 +70,13 @@
     <nav class="nav container">
       <a class="logo" href="#hero">✨ 萨姆萤光灯</a>
 
-      <!-- 右上角访客统计（不蒜子） -->
-      <div class="visit-counter" id="visit-counter" title="本站访客统计（不蒜子）">
+      <!-- 右上角访客统计（Vercount —— 不蒜子已停服，这是它的开源替代） -->
+      <div class="visit-counter" id="visit-counter" title="本站访客统计（Vercount）">
         <span class="vc-line" id="vc-line">
           <span class="vc-icon">✨</span>
-          <span class="vc-you">你是本站第</span><b id="busuanzi_value_site_uv">···</b><span class="vc-you">位访客</span>
+          <span class="vc-you">你是本站第</span><b id="vercount_value_site_uv">···</b><span class="vc-you">位访客</span>
           <span class="vc-sep">·</span>
-          <span class="vc-total">总访问量</span><b id="busuanzi_value_site_pv">···</b><span class="vc-total">次</span>
+          <span class="vc-total">总访问量</span><b id="vercount_value_site_pv">···</b><span class="vc-total">次</span>
         </span>
         <span class="vc-fallback" id="vc-fallback" hidden>✨ 统计加载失败</span>
       </div>
@@ -317,7 +317,8 @@
     <p>© <span id="year"></span> 萨姆萤光灯</p>
   </footer>
 
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <!-- 访客统计：Vercount（不蒜子已停服，这是它的开源替代，会自动同步原有计数） -->
+  <script defer src="https://events.vercount.one/js"></script>
   <script src="bg-realtime.js"></script>
   <script src="videos.js"></script>
   <script src="projects.js"></script>
