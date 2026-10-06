@@ -6,7 +6,7 @@ window.BILI_VIDEOS = {
   "followers": 7464,
   "seasonTitle": "流萤翻唱",
   "seasonTotal": 207,
-  "total": 207,
+  "total": 210,
   "videos": [
     {
       "bvid": "BV1SdHx6jExA",
@@ -17,6 +17,16 @@ window.BILI_VIDEOS = {
       "cover": "https://i0.hdslb.com/bfs/archive/5b5dc62cbefbbd7e19dc27bd3d2d3c4fa2a1db1b.jpg",
       "section": "其它",
       "url": "https://www.bilibili.com/video/BV1SdHx6jExA"
+    },
+    {
+      "bvid": "BV15RHr6PEm3",
+      "title": "按下按钮，我就能听到你的告白，但代价是再也感觉不到被爱...",
+      "date": "2026-10-04",
+      "duration": 164,
+      "views": 2139,
+      "cover": "https://i2.hdslb.com/bfs/archive/fe69b72f86461b53f83c37866c0073aec8db821e.jpg",
+      "section": "",
+      "url": "https://www.bilibili.com/video/BV15RHr6PEm3"
     },
     {
       "bvid": "BV1D9a26eEbx",
@@ -229,6 +239,16 @@ window.BILI_VIDEOS = {
       "url": "https://www.bilibili.com/video/BV1KwMk6HE35"
     },
     {
+      "bvid": "BV11duF6TEhS",
+      "title": "【galgame】和流萤的一天",
+      "date": "2026-08-04",
+      "duration": 1133,
+      "views": 2530,
+      "cover": "https://i0.hdslb.com/bfs/archive/a7214f443da1bdb8875c59a7d40f844c69c1ab05.jpg",
+      "section": "",
+      "url": "https://www.bilibili.com/video/BV11duF6TEhS"
+    },
+    {
       "bvid": "BV1Tv3f6CEjY",
       "title": "山茶花读不懂白玫瑰 流萤翻唱",
       "date": "2026-08-03",
@@ -417,6 +437,16 @@ window.BILI_VIDEOS = {
       "cover": "https://i1.hdslb.com/bfs/archive/6044a4eea69fe6284b6899c4129f9a9e4f92b98f.jpg",
       "section": "其它",
       "url": "https://www.bilibili.com/video/BV1hyTk6ZEGA"
+    },
+    {
+      "bvid": "BV1q3Ta66Ehm",
+      "title": "7.1抽奖",
+      "date": "2026-07-01",
+      "duration": 149,
+      "views": 602,
+      "cover": "https://i1.hdslb.com/bfs/archive/20f7e180834d22ea18c5a23bda4db59371d90de9.jpg",
+      "section": "",
+      "url": "https://www.bilibili.com/video/BV1q3Ta66Ehm"
     },
     {
       "bvid": "BV12gKo6WEu4",
