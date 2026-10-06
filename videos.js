@@ -1,6 +1,6 @@
 /* 本文件由同步脚本自动生成，请勿手改；重新同步：node refresh-videos.mjs 或 py -3 refresh_videos.py */
 window.BILI_VIDEOS = {
-  "updated": "2026-10-06 23:59",
+  "updated": "2026-10-07 00:04",
   "mid": "669867138",
   "space": "https://space.bilibili.com/669867138",
   "followers": 7464,
@@ -13,7 +13,7 @@ window.BILI_VIDEOS = {
       "title": "大鱼 流萤翻唱",
       "date": "2026-10-05",
       "duration": 314,
-      "views": 464,
+      "views": 465,
       "cover": "https://i0.hdslb.com/bfs/archive/5b5dc62cbefbbd7e19dc27bd3d2d3c4fa2a1db1b.jpg",
       "section": "其它",
       "url": "https://www.bilibili.com/video/BV1SdHx6jExA"
@@ -23,7 +23,7 @@ window.BILI_VIDEOS = {
       "title": "按下按钮，我就能听到你的告白，但代价是再也感觉不到被爱...",
       "date": "2026-10-04",
       "duration": 164,
-      "views": 2139,
+      "views": 2144,
       "cover": "https://i2.hdslb.com/bfs/archive/fe69b72f86461b53f83c37866c0073aec8db821e.jpg",
       "section": "",
       "url": "https://www.bilibili.com/video/BV15RHr6PEm3"
@@ -53,7 +53,7 @@ window.BILI_VIDEOS = {
       "title": "Two to Tango 流萤翻唱",
       "date": "2026-09-26",
       "duration": 247,
-      "views": 2856,
+      "views": 2859,
       "cover": "https://i1.hdslb.com/bfs/archive/8e40ae1943c0bf1779bf33dd714749015ca5f9ad.jpg",
       "section": "官方曲目",
       "url": "https://www.bilibili.com/video/BV1zRhD64Ee5"
@@ -100,7 +100,7 @@ window.BILI_VIDEOS = {
     },
     {
       "bvid": "BV1z4t462EiN",
-      "title": "盛放 流萤翻唱",
+      "title": "【萤翻二周年】盛放 流萤翻唱",
       "date": "2026-08-31",
       "duration": 153,
       "views": 1030,
@@ -280,7 +280,7 @@ window.BILI_VIDEOS = {
     },
     {
       "bvid": "BV1Pq3p6iENp",
-      "title": "[整活]轻松绷住 流萤翻唱",
+      "title": "流萤：我也要绷住吗",
       "date": "2026-07-30",
       "duration": 142,
       "views": 1532,
@@ -310,7 +310,7 @@ window.BILI_VIDEOS = {
     },
     {
       "bvid": "BV1Huga6XEG8",
-      "title": "Summer Dream 流萤翻唱",
+      "title": "来和流萤一起做一次仲夏之梦",
       "date": "2026-07-24",
       "duration": 217,
       "views": 1393,
@@ -340,7 +340,7 @@ window.BILI_VIDEOS = {
     },
     {
       "bvid": "BV1WpKB6YEhY",
-      "title": "下一站 流萤翻唱",
+      "title": "下一站，但是流萤翻唱",
       "date": "2026-07-19",
       "duration": 227,
       "views": 1065,
@@ -490,7 +490,7 @@ window.BILI_VIDEOS = {
     },
     {
       "bvid": "BV1cuJc6REtt",
-      "title": "嘉宾 流萤填翻",
+      "title": "「冥冥中，成为我的唯一」——致流萤：跨越终末结局，有你偕行",
       "date": "2026-06-19",
       "duration": 269,
       "views": 1651,
@@ -633,7 +633,7 @@ window.BILI_VIDEOS = {
       "title": "春日梦语 流萤翻唱",
       "date": "2026-04-05",
       "duration": 179,
-      "views": 2968,
+      "views": 2969,
       "cover": "https://i2.hdslb.com/bfs/archive/f3fd115f471b6e7b41c7d6806cc3fa52f65111e3.jpg",
       "section": "其它",
       "url": "https://www.bilibili.com/video/BV1ekSUBQEzz"
