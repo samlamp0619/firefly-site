@@ -160,18 +160,23 @@
         <h2 class="section-title reveal">2026.10 发稿计划 <span class="deco">✦</span></h2>
 
         <div class="schedule-card glass reveal">
-          <div class="schedule-table-wrap">
-            <table class="schedule-table">
-              <thead>
-                <tr>
-                  <th scope="col">日期</th>
-                  <th scope="col">歌曲</th>
-                  <th scope="col">原唱</th>
-                  <th scope="col">歌曲投稿人</th>
-                </tr>
-              </thead>
-              <tbody id="schedule-body"></tbody>
-            </table>
+          <div class="sched-layout">
+            <!-- 左：月历 -->
+            <div class="cal">
+              <div class="cal-head">
+                <button type="button" class="cal-nav" id="cal-prev" aria-label="上个月">‹</button>
+                <span class="cal-title" id="cal-title"></span>
+                <button type="button" class="cal-nav" id="cal-next" aria-label="下个月">›</button>
+              </div>
+              <div class="cal-week" aria-hidden="true">
+                <span>日</span><span>一</span><span>二</span><span>三</span>
+                <span>四</span><span>五</span><span>六</span>
+              </div>
+              <div class="cal-grid" id="cal-grid"></div>
+            </div>
+
+            <!-- 右：选中日期的详情 -->
+            <div class="cal-detail" id="cal-detail" aria-live="polite"></div>
           </div>
 
           <p class="schedule-note">注：此表格中日期、发稿歌曲仅供参考，以实际发稿为准。</p>

@@ -548,183 +548,260 @@ main, header, footer { position: relative; z-index: 3; }
   .notice-card { flex-direction: column; }
 }
 
-/* ===== 发稿计划 ===== */
-/* 行状态配色：过去=灰、今天=黄、未来=绿（与 schedule.js 的 is-past / is-today / is-future 对应） */
+/* ===== 发稿计划（日历视图） ===== */
+/* 配色约定：过去=灰、今天=黄、未来=绿（与 schedule.js 的 is-past / is-today / is-future 对应） */
 .schedule-card {
-  max-width: 1000px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 24px 22px 18px;
 }
 
-.schedule-table-wrap {
-  border-radius: 18px;
-  overflow: hidden;
+.sched-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+/* ---------- 左：月历 ---------- */
+.cal {
   background: rgba(255, 255, 255, 0.55);
+  border-radius: 18px;
+  padding: 14px 14px 10px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9);
 }
 
-.schedule-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 0.95rem;
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
-.schedule-table th {
+.cal-title {
   font-family: var(--font-head);
-  font-weight: 400;
-  font-size: 0.98rem;
-  letter-spacing: 0.08em;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
   color: var(--purple);
-  background: rgba(46, 196, 182, 0.1);
-  border-bottom: 2px solid rgba(31, 158, 146, 0.22);
-  padding: 12px 10px;
+}
+
+.cal-nav {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(31, 158, 146, 0.28);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--purple);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.cal-nav:hover { background: #fff; transform: translateY(-1px); }
+
+.cal-week,
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.cal-week { margin-bottom: 6px; }
+
+.cal-week span {
+  text-align: center;
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+  opacity: 0.85;
+}
+
+.cal-day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 54px;
+  padding: 6px 7px;
+  border: 1.5px solid transparent;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.45);
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--ink);
   text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
-.schedule-table th:nth-child(1) { width: 28%; }
-.schedule-table th:nth-child(2) { width: 27%; }
-.schedule-table th:nth-child(3) { width: 26%; }
-.schedule-table th:nth-child(4) { width: 19%; }
-
-.schedule-table td {
-  padding: 13px 10px;
-  border-top: 1px solid rgba(31, 158, 146, 0.14);
-  vertical-align: middle;
-  word-break: break-word;
+.cal-day.is-blank {
+  background: transparent;
+  cursor: default;
+  pointer-events: none;
 }
 
-.schedule-table tbody tr:first-child td { border-top: none; }
-
-/* 三种行状态 */
-.sched-row.is-past td {
-  background: rgba(139, 152, 149, 0.16);
-  color: #7c8b88;
+.cal-day:not(.is-blank):hover {
+  transform: translateY(-1px);
+  border-color: rgba(31, 158, 146, 0.35);
 }
 
-.sched-row.is-today td {
-  background: rgba(255, 209, 102, 0.34);
-  color: #7a5a0c;
+.cal-num { font-size: 0.82rem; font-weight: 700; opacity: 0.85; }
+
+.cal-song {
+  width: 100%;
+  font-size: 0.68rem;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.92;
 }
 
-.sched-row.is-future td {
-  background: rgba(64, 186, 108, 0.15);
+/* 有安排的三态 */
+.cal-day.has-song.is-past {
+  background: rgba(139, 152, 149, 0.18);
+  color: #6c7c79;
+}
+
+.cal-day.has-song.is-future {
+  background: rgba(64, 186, 108, 0.16);
   color: #2b7a4b;
 }
 
-/* 今天那一行加个描边，扫一眼就能看到 */
-.sched-row.is-today td:first-child { box-shadow: inset 3px 0 0 rgba(226, 168, 0, 0.75); }
-
-.sched-cell-date { white-space: nowrap; }
-
-.sched-date {
-  display: block;
-  font-weight: 700;
+.cal-day.has-song.is-today {
+  background: rgba(255, 209, 102, 0.4);
+  color: #8a6410;
 }
 
-.sched-date em {
+/* 今天：不管有没有安排都描一圈 */
+.cal-day.is-today { border-color: rgba(226, 168, 0, 0.65); }
+.cal-day.is-today .cal-num { opacity: 1; }
+
+/* 选中 */
+.cal-day.is-selected {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 2px rgba(46, 196, 182, 0.22);
+}
+
+/* ---------- 右：详情 ---------- */
+.cal-detail {
+  min-height: 250px;
+  padding: 20px 20px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+.detail-head { margin-bottom: 10px; }
+
+.detail-date {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  color: var(--purple);
+}
+
+.detail-date em {
   font-style: normal;
-  font-size: 0.78rem;
-  opacity: 0.72;
-  margin-left: 4px;
-}
-
-.sched-tag {
-  display: inline-block;
-  margin-top: 4px;
-  padding: 1px 9px;
-  border-radius: 999px;
-  border: 1px solid currentColor;
-  background: rgba(255, 255, 255, 0.7);
-  font-size: 0.72rem;
-  opacity: 0.9;
-}
-
-.sched-cell-song { font-weight: 700; }
-
-/* 已发稿：歌曲名是去 B 站的直链 */
-.sched-link {
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 3px;
-  transition: opacity 0.25s ease;
-}
-
-.sched-link:hover { opacity: 0.72; }
-
-.sched-link-mark {
-  display: inline-block;
+  font-size: 0.8rem;
+  opacity: 0.7;
   margin-left: 6px;
-  padding: 1px 8px;
+}
+
+.detail-tag {
+  display: inline-block;
+  padding: 2px 11px;
   border-radius: 999px;
   border: 1px solid currentColor;
-  background: rgba(255, 255, 255, 0.7);
-  font-size: 0.7rem;
-  font-weight: 500;
-  text-decoration: none;
-  white-space: nowrap;
-  vertical-align: middle;
+  font-size: 0.74rem;
 }
 
-.sched-cell-submitter { font-weight: 500; }
+.detail-tag.is-past { color: #6c7c79; background: rgba(139, 152, 149, 0.16); }
+.detail-tag.is-future { color: #2b7a4b; background: rgba(64, 186, 108, 0.15); }
+.detail-tag.is-today { color: #8a6410; background: rgba(255, 209, 102, 0.32); }
 
-/* 串烧节目：在歌名下面附一行曲目清单 */
-.sched-medley {
-  display: block;
-  margin-top: 3px;
-  font-size: 0.76rem;
+.detail-song {
+  font-family: var(--font-head);
+  font-size: 1.35rem;
   font-weight: 400;
-  line-height: 1.5;
-  opacity: 0.72;
+  line-height: 1.4;
+  margin: 10px 0 0;
+  word-break: break-word;
 }
 
-.sched-empty { opacity: 0.5; }
-
-.schedule-note {
-  margin-top: 14px;
-  text-align: center;
+.detail-medley {
+  margin-top: 6px;
   font-size: 0.8rem;
   color: var(--ink-soft);
 }
 
-/* 窄屏：表格转为卡片式，避免四列被挤扁 */
+.detail-meta {
+  margin: 16px 0 0;
+  display: grid;
+  gap: 8px;
+}
+
+.detail-meta > div {
+  display: flex;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(31, 158, 146, 0.2);
+  font-size: 0.88rem;
+}
+
+.detail-meta dt {
+  flex: 0 0 58px;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.detail-meta dd { margin: 0; word-break: break-word; }
+
+.detail-link {
+  display: inline-block;
+  margin-top: 18px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--purple);
+  transition: letter-spacing 0.25s;
+}
+
+.detail-link:hover { letter-spacing: 0.06em; }
+
+.detail-soon,
+.detail-none {
+  margin-top: 14px;
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+}
+
+.detail-empty { opacity: 0.5; }
+
+/* 窄屏：改成上下布局 */
+@media (max-width: 760px) {
+  .sched-layout { grid-template-columns: minmax(0, 1fr); }
+  .cal-detail { min-height: 0; }
+}
+
+/* 更窄：格子里放不下歌名，只留数字 + 一个表示「有安排」的小圆点 */
 @media (max-width: 600px) {
   .schedule-card { padding: 18px 14px 14px; }
-
-  .schedule-table,
-  .schedule-table tbody,
-  .schedule-table tr,
-  .schedule-table td { display: block; width: auto; }
-
-  .schedule-table thead { display: none; }
-
-  .schedule-table tbody tr {
-    border-radius: 16px;
-    overflow: hidden;
-    margin-bottom: 12px;
-    box-shadow: 0 6px 18px rgba(31, 158, 146, 0.1);
+  .cal { padding: 10px 10px 8px; }
+  .cal-day { min-height: 44px; padding: 5px; border-radius: 9px; }
+  .cal-num { font-size: 0.78rem; }
+  .cal-song { display: none; }
+  .cal-day.has-song::after {
+    content: "";
+    position: absolute;
+    top: 7px;
+    right: 6px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
   }
-
-  .schedule-table tbody tr:last-child { margin-bottom: 0; }
-
-  .schedule-table td {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    padding: 9px 14px;
-    border-top: none;
-  }
-
-  .schedule-table td::before {
-    content: attr(data-label);
-    flex: 0 0 56px;
-    font-family: var(--font-head);
-    font-size: 0.82rem;
-    opacity: 0.72;
-  }
-
-  .sched-row.is-today td:first-child { box-shadow: inset 4px 0 0 rgba(226, 168, 0, 0.75); }
+  .cal-week span { font-size: 0.7rem; }
 }
 
 /* ===== 资源 ===== */
@@ -1412,38 +1489,51 @@ html[data-theme="dark"] .resource-disclaimer {
 
 html[data-theme="dark"] .project-tags span { background: rgba(79, 208, 192, 0.16); }
 
-/* 排期表 */
-html[data-theme="dark"] .schedule-table-wrap {
+/* 排期日历 */
+html[data-theme="dark"] .cal,
+html[data-theme="dark"] .cal-detail {
   background: rgba(18, 32, 37, 0.6);
   box-shadow: inset 0 0 0 1px rgba(82, 126, 120, 0.28);
 }
 
-html[data-theme="dark"] .schedule-table th {
-  background: rgba(79, 208, 192, 0.1);
-  border-bottom-color: rgba(79, 208, 192, 0.28);
+html[data-theme="dark"] .cal-nav {
+  background: rgba(26, 43, 48, 0.9);
+  border-color: rgba(82, 126, 120, 0.5);
 }
 
-html[data-theme="dark"] .schedule-table td { border-top-color: rgba(82, 126, 120, 0.24); }
+html[data-theme="dark"] .cal-nav:hover { background: rgba(34, 55, 61, 0.95); }
 
-html[data-theme="dark"] .sched-row.is-past td {
-  background: rgba(120, 138, 135, 0.16);
+html[data-theme="dark"] .cal-day { background: rgba(26, 43, 48, 0.55); }
+
+html[data-theme="dark"] .cal-day.is-blank { background: transparent; }
+
+html[data-theme="dark"] .cal-day.has-song.is-past {
+  background: rgba(120, 138, 135, 0.18);
   color: #8fa09d;
 }
 
-html[data-theme="dark"] .sched-row.is-today td {
-  background: rgba(255, 209, 102, 0.16);
+html[data-theme="dark"] .cal-day.has-song.is-today {
+  background: rgba(255, 209, 102, 0.18);
   color: #ffd97a;
 }
 
-html[data-theme="dark"] .sched-row.is-future td {
-  background: rgba(64, 186, 108, 0.17);
+html[data-theme="dark"] .cal-day.has-song.is-future {
+  background: rgba(64, 186, 108, 0.18);
   color: #7fd8a3;
 }
 
-html[data-theme="dark"] .sched-tag,
-html[data-theme="dark"] .sched-link-mark {
-  background: rgba(18, 32, 37, 0.8);
+html[data-theme="dark"] .cal-day.is-today { border-color: rgba(255, 209, 102, 0.55); }
+
+html[data-theme="dark"] .cal-day.is-selected {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 2px rgba(79, 208, 192, 0.25);
 }
+
+html[data-theme="dark"] .detail-tag.is-past { color: #8fa09d; background: rgba(120, 138, 135, 0.18); }
+html[data-theme="dark"] .detail-tag.is-today { color: #ffd97a; background: rgba(255, 209, 102, 0.16); }
+html[data-theme="dark"] .detail-tag.is-future { color: #7fd8a3; background: rgba(64, 186, 108, 0.16); }
+
+html[data-theme="dark"] .detail-meta > div { border-top-color: rgba(82, 126, 120, 0.3); }
 
 /* 作品栏 */
 html[data-theme="dark"] .works-search {
