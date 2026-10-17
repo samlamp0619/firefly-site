@@ -1,2 +1,7 @@
 # 本地 exe 启动器（由 firefly-launcher/build.ps1 生成），不进仓库
 *.exe
+
+# 构建产物：带内容哈希的静态资源副本（由 build.mjs 在构建时生成）
+# 例如 main.a1b2c3d4.js / styles.0f9e8d7c.css，不进仓库
+/[a-zA-Z0-9_-]*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].js
+/[a-zA-Z0-9_-]*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].css

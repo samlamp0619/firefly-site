@@ -395,20 +395,23 @@
   document.getElementById("year").textContent = new Date().getFullYear();
 
   /* ================= 访客统计 =================
-   * 服务用的是 Vercount（https://vercount.one），不蒜子的开源替代：
-   * 不蒜子已停服（原站 502），Vercount 兼容其用法。
+   * 两层来源，前者不通自动退后者：
    *
-   * ⚠️ 这里刻意**不用 Vercount 的官方脚本**，原因是它把请求超时**硬编码成 5 秒**，
-   *    而它的 API 从国内访问实测要 1.4~5.3 秒（走 Cloudflare 海外边缘，
-   *    实测落在阿姆斯特丹 AMS），经常刚好被 abort，数字就永远填不上、
-   *    只剩「统计加载失败」。所以这里自己发请求：超时放宽到 12 秒，
-   *    并把上次拿到的数值缓存在 localStorage，回访时先秒显缓存再后台刷新。
+   * 1) 自建接口 POST /api/count —— 跑在 EdgeOne 边缘节点（见 ./edge-functions/api/count.js）
+   *    数据存在 EdgeOne KV 里。和站点同一个网络，响应是毫秒级，
+   *    而且不再依赖任何第三方公益服务。
+   *    没绑定 KV 时它返回 503，会自动走第 2 层。
    *
-   * 接口（读官方脚本源码得到）：
-   *   POST https://events.vercount.one/api/v2/log
-   *   body   { url: 当前完整地址, isNewUv: 是否首次访问 }
-   *   返回   { status:"success", data:{ site_uv, site_pv, page_pv } }
-   * UV 用 cookie 去重，cookie 名与官方脚本一致，避免重复计数。 */
+   * 2) Vercount（https://vercount.one）—— 不蒜子的开源替代（不蒜子已停服，原站 502）。
+   *    ⚠️ 刻意**不用它的官方脚本**：它把请求超时**硬编码成 5 秒**，
+   *    而它的接口从国内访问实测要 1.4~5.3 秒（走 Cloudflare 海外边缘，
+   *    实测落在阿姆斯特丹 AMS），经常刚好被 abort，数字就永远填不上。
+   *    接口：POST https://events.vercount.one/api/v2/log
+   *          body { url, isNewUv } → { status:"success", data:{ site_uv, site_pv } }
+   *
+   * 两层都自己发请求，所以超时统一放宽到 12 秒；
+   * 拿到的数值缓存进 localStorage，回访时先秒显缓存再后台刷新。
+   * UV 用 cookie 去重（cookie 名沿用 Vercount 的，换后端也不会重复计数）。 */
   (() => {
     const uvEl = document.getElementById("vercount_value_site_uv");
     const pvEl = document.getElementById("vercount_value_site_pv");
@@ -416,8 +419,9 @@
     const fb = document.getElementById("vc-fallback");
     if (!uvEl && !pvEl) return;
 
-    const API = "https://events.vercount.one/api/v2/log";
-    const CACHE_KEY = "visitorCountData";   // 与官方脚本同名，便于互通
+    const SELF_API = "/api/count";                               // 自建，优先
+    const FALLBACK_API = "https://events.vercount.one/api/v2/log"; // 第三方，兜底
+    const CACHE_KEY = "visitorCountData";   // 与 Vercount 官方脚本同名，便于互通
     const TIMEOUT = 12000;
 
     const fmtNum = n => Number(n).toLocaleString("zh-CN");
@@ -451,21 +455,44 @@
       return true;
     }
 
-    async function fetchCount() {
+    /* 统一的 POST-JSON 封装：超时自己控制，失败一律返回 null（不抛） */
+    async function postJson(url, body) {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), TIMEOUT);
       try {
-        const r = await fetch(API, {
+        const r = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: location.href, isNewUv: isNewUv() }),
+          body: JSON.stringify(body),
           signal: ctrl.signal,
         });
-        const j = await r.json();
-        return (j && j.data) || null;
+        if (!r.ok) return null;
+        return await r.json();
+      } catch {
+        return null;
       } finally {
         clearTimeout(timer);
       }
+    }
+
+    const isNum = v => Number.isFinite(Number(v));
+
+    async function fetchCount() {
+      const isNew = isNewUv();   // 有副作用（写 cookie），两条路只用同一个判断结果
+
+      // 1) 自建接口（毫秒级）。没绑 KV 时返回 503 → postJson 拿到 null → 落到下一层
+      const self = await postJson(SELF_API, { url: location.href, isNewUv: isNew });
+      if (self && (isNum(self.site_pv) || isNum(self.site_uv))) {
+        return { site_pv: Number(self.site_pv) || 0, site_uv: Number(self.site_uv) || 0 };
+      }
+
+      // 2) Vercount 兜底
+      const fbJson = await postJson(FALLBACK_API, { url: location.href, isNewUv: isNew });
+      if (fbJson && fbJson.data && (isNum(fbJson.data.site_pv) || isNum(fbJson.data.site_uv))) {
+        return fbJson.data;
+      }
+
+      return null;
     }
 
     function fail() {

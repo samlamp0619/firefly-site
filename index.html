@@ -322,13 +322,17 @@
     <p>© <span id="year"></span> 萨姆萤光灯</p>
   </footer>
 
-  <!-- 访客统计：刻意不用 Vercount 的官方脚本——它把请求超时硬编码成 5 秒，
-       而它的接口从国内访问实测 1.4~5.3 秒，经常刚好被 abort，数字就填不上。
-       改由 main.js 直接调用计数接口（超时放宽到 12 秒 + 本地缓存）。 -->
-  <script src="bg-realtime.js"></script>
-  <script src="videos.js"></script>
-  <script src="projects.js"></script>
-  <script src="schedule.js"></script>
-  <script src="main.js"></script>
+  <!-- 访客统计：不再引第三方脚本，由 main.js 直接请求接口
+       （优先自建 /api/count，跑在 EdgeOne 边缘；失败自动退回 Vercount）。
+       详见 main.js「访客统计」一节。 -->
+
+  <!-- 全部用 defer：顺序仍然保证，但下载变成并行，不再互相排队。
+       文件名里的哈希由 build.mjs 在 EdgeOne 构建时加上，
+       这样没改动的文件能吃到一年的浏览器缓存。 -->
+  <script defer src="bg-realtime.js"></script>
+  <script defer src="videos.js"></script>
+  <script defer src="projects.js"></script>
+  <script defer src="schedule.js"></script>
+  <script defer src="main.js"></script>
 </body>
 </html>
