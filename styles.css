@@ -1326,11 +1326,14 @@ a.contact-card:hover {
 }
 
 /* ===== 响应式 ===== */
-/* 中等屏幕：右上角统计精简，导航内边距收紧防拥挤 */
+/* 中等及以下屏幕：右上角统计精简成「你是本站第 N 位访客」。
+   ⚠️ 必须把 .vc-pv 一起隐藏——只藏标签不藏数字的话，会变成
+   「你是本站第 29 位访客 69」这种后面挂个光秃秃数字的样子。 */
 @media (max-width: 1100px) {
   .visit-counter .vc-total,
   .visit-counter .vc-sep,
-  .visit-counter .vc-icon { display: none; }
+  .visit-counter .vc-icon,
+  .visit-counter .vc-pv { display: none; }
   .nav-links a { padding: 8px 12px; }
 }
 
