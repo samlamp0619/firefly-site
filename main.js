@@ -495,19 +495,25 @@
       return null;
     }
 
+    /* 页面里是否已经有一个真实数字（构建时烤进去的，或上一次渲染留下的） */
+    const hasNumber = el => !!(el && el.textContent && el.textContent.trim() !== "···");
+
     function fail() {
+      // 已经有数字就保留，不要退化成「加载失败」——那个数字仍然是有意义的
+      if (hasNumber(uvEl) || hasNumber(pvEl)) return;
       if (line) line.hidden = true;
       if (fb) fb.hidden = false;
     }
 
-    // 回访：先显缓存，再后台刷新，数字是秒出的
+    // 已经有数字（localStorage 缓存 或 构建时烤进 HTML）：先显示，再后台刷新
     const cached = readCache();
-    if (cached && paint(cached)) {
+    const painted = cached && paint(cached);
+    if (painted || hasNumber(uvEl) || hasNumber(pvEl)) {
       fetchCount().then(d => { if (d) { paint(d); writeCache(d); } }).catch(() => {});
       return;
     }
 
-    // 首次：等接口返回
+    // 首次且没有任何数字：等接口返回
     fetchCount()
       .then(d => { if (d && paint(d)) writeCache(d); else fail(); })
       .catch(fail);

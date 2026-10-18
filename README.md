@@ -63,6 +63,16 @@ personal-website/
 - **不引它的官方脚本**：它把请求超时**硬编码成 5 秒**，而接口从国内实测要 1.4～5.3 秒，经常刚好被 abort，数字就永远填不上。
 - 所以 `main.js` 直接调 `POST https://events.vercount.one/api/v2/log`，body `{ url, isNewUv }`。
 
+### 构建时把数字烤进 HTML（让首访也秒看到）
+
+Vercount 有个**只读**接口（`GET /api/v2/log?url=...`，返回 `Data retrieved successfully`，**不增加计数**——只有 POST 才计数）。`build.mjs` 在构建时调它，把当前访客数直接写进 `index.html` 的两个 `<b>` 里。
+
+- 效果：**第一次访问**的访客也能立刻看到数字，不用等那约 1.8 秒的异步请求。
+- 浏览器加载后仍会用实时数据覆盖，所以烤进去的偏旧也没关系。
+- `main.js` 配套处理了：**页面里已经有数字就不会退化成「加载失败」**。
+- 取不到（比如构建机连不上 Vercount）就保留 `···` 占位，**不影响构建**。
+- 注意：Vercount 按 URL 分站点，所以**用 `file://` 本地预览时数字会不一样**（本地文件是另一套计数），这是正常的，部署后正确。
+
 ### 两层共用的细节
 
 - 超时统一 **12 秒**；数值写进 `localStorage`（键名 `visitorCountData`），**回访时先秒显缓存、再后台刷新**；

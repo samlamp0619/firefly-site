@@ -106,7 +106,7 @@ log("=".repeat(52));
 log("  萨姆萤光灯 · EdgeOne 构建");
 log("=".repeat(52));
 log("");
-log("[1/2] 同步 B 站投稿（失败不影响构建）");
+log("[1/3] 同步 B 站投稿（失败不影响构建）");
 const sync = spawnSync(process.execPath, [join(HERE, "refresh-videos.mjs")], {
   cwd: HERE,
   stdio: "inherit",
@@ -115,9 +115,66 @@ if (sync.status !== 0) {
   log(`  [警告] 同步脚本退出码 ${sync.status}，沿用仓库里现有的 videos.js`);
 }
 
-// ---------- 2. 资源哈希 ----------
+// ---------- 2. 把当前访客数烤进 HTML ----------
+/* 为什么要烤：
+ *   访客数平时是页面加载后异步请求拿的，第一次访问（浏览器本地还没缓存）
+ *   要等接口返回——Vercount 从国内要 1.8 秒左右，那段时间只显示「···」。
+ *   Vercount 有一个只读接口（GET 带 url 参数，不会增加计数），
+ *   所以构建时可以把当前数字直接写进 HTML，首访也能秒看到。
+ *   浏览器加载后仍会用实时数据覆盖，所以烤进去的偏旧也没关系。 */
+const VERCOUNT_READ = "https://events.vercount.one/api/v2/log";
+const SITE_URL = "https://samlamp.top/";
+
+const withCommas = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+async function bakeCounter() {
+  const file = join(HERE, "index.html");
+  if (!existsSync(file)) return;
+  const html = readFileSync(file, "utf8");
+  if (!html.includes('id="vercount_value_site_uv"')) {
+    log("  [跳过] 页面里没有统计元素");
+    return;
+  }
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 15000);
+    let j;
+    try {
+      const r = await fetch(`${VERCOUNT_READ}?url=${encodeURIComponent(SITE_URL)}`, {
+        signal: ctrl.signal,
+        headers: { Accept: "application/json" },
+      });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      j = await r.json();
+    } finally {
+      clearTimeout(timer);
+    }
+    const d = j && j.data;
+    if (!d) throw new Error("返回里没有 data");
+    const uv = Number(d.site_uv);
+    const pv = Number(d.site_pv);
+    if (!Number.isFinite(uv) || !Number.isFinite(pv)) throw new Error("数值无效");
+
+    const out = html
+      .replace(/(<b id="vercount_value_site_uv">)[^<]*(<\/b>)/, `$1${withCommas(uv)}$2`)
+      .replace(/(<b id="vercount_value_site_pv">)[^<]*(<\/b>)/, `$1${withCommas(pv)}$2`);
+    if (out === html) throw new Error("没匹配到统计元素");
+
+    writeFileSync(file, out, "utf8");
+    log(`  [OK] 已烤入当前访客数：UV ${uv} / PV ${pv}`);
+  } catch (e) {
+    // 取不到就算了：页面保持「···」，浏览器加载后照样能拿到
+    log(`  [警告] 取访客数失败（${e.message}），保留占位符，不影响构建`);
+  }
+}
+
 log("");
-log("[2/2] 给静态资源加内容哈希");
+log("[2/3] 把当前访客数烤进 HTML（让首访也能秒看到数字）");
+await bakeCounter();
+
+// ---------- 3. 资源哈希 ----------
+log("");
+log("[3/3] 给静态资源加内容哈希");
 const total = [];
 for (const page of ["index.html", "404.html"]) {
   total.push(...processHtml(join(HERE, page)));
