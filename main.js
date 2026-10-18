@@ -5,13 +5,22 @@
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ================= 背景图：实时池 + 本地兜底 + 只看实时开关 ================= */
+  /* 每张本地图都有两个尺寸：
+       url   原图，1920 宽（211~567KB）—— 桌面用
+       urlSm 窄屏图，800 宽（57~166KB）—— 手机/竖屏平板用，省约 70% 流量
+     手机屏幕只有 390 CSS px，就算 DPR 2 也只需要 780px，加载 1920 宽纯属浪费。 */
   const LOCAL_BG = [
-    { url: "assets/bg/bg-140591786.jpg", credit: "背景 © Pixiv 140591786" },
-    { url: "assets/bg/bg-144019913.jpg", credit: "背景 © Pixiv 144019913「春日手信」" },
-    { url: "assets/bg/bg-139886638.jpg", credit: "背景 © Pixiv 139886638「萤涟蝶梦」" },
-    { url: "assets/bg/bg-143979655.jpg", credit: "背景 © Pixiv 143979655" },
-    { url: "assets/bg/bg-141185006.jpg", credit: "背景 © Pixiv 141185006" },
+    { url: "assets/bg/bg-140591786.jpg", urlSm: "assets/bg/bg-140591786-s.jpg", credit: "背景 © Pixiv 140591786" },
+    { url: "assets/bg/bg-144019913.jpg", urlSm: "assets/bg/bg-144019913-s.jpg", credit: "背景 © Pixiv 144019913「春日手信」" },
+    { url: "assets/bg/bg-139886638.jpg", urlSm: "assets/bg/bg-139886638-s.jpg", credit: "背景 © Pixiv 139886638「萤涟蝶梦」" },
+    { url: "assets/bg/bg-143979655.jpg", urlSm: "assets/bg/bg-143979655-s.jpg", credit: "背景 © Pixiv 143979655" },
+    { url: "assets/bg/bg-141185006.jpg", urlSm: "assets/bg/bg-141185006-s.jpg", credit: "背景 © Pixiv 141185006" },
   ];
+
+  /* 按视口宽度挑尺寸。820px 以上（笔记本/桌面）用原图；以下用 -s 小图。
+     实时池里的图本身只有 800 宽左右、没有 urlSm，会自动走 url，不受影响。 */
+  const SMALL_BG_BREAKPOINT = 820;
+  const srcOf = it => (window.innerWidth <= SMALL_BG_BREAKPOINT && it.urlSm) ? it.urlSm : it.url;
 
   // 由 refresh_bg.py 生成的实时图（bg-realtime.js 注入），file:// 打开也兼容
   let realtimeBg = Array.isArray(window.REALTIME_BG) ? window.REALTIME_BG : [];
@@ -52,7 +61,7 @@
   function activate(idx) {
     const it = pool[idx];
     const layer = layers[layerTurn % 2];
-    layer.style.backgroundImage = 'url("' + it.url + '")';
+    layer.style.backgroundImage = 'url("' + srcOf(it) + '")';
     layer.classList.remove("kb");
     void layer.offsetWidth; // 强制重排，重启 kenburns 动画
     layer.classList.add("active", "kb");
@@ -76,7 +85,7 @@
   function prefetchNext() {
     if (pool.length < 2) return;
     const img = new Image();
-    img.src = pool[(cur + 1) % pool.length].url;   // 丢给浏览器缓存，轮到时基本秒开
+    img.src = srcOf(pool[(cur + 1) % pool.length]);   // 丢给浏览器缓存，轮到时基本秒开
   }
 
   async function showAt(idx) {
@@ -84,7 +93,7 @@
     const n = pool.length;
     for (let k = 0; k < n; k++) {          // 坏图自动顺延到下一张
       const i = (idx + k) % n;
-      const ok = await loadImage(pool[i].url);
+      const ok = await loadImage(srcOf(pool[i]));
       if (token !== loadToken) return;      // 期间被 restartCarousel 作废了
       if (ok) {
         cur = i;
