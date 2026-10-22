@@ -490,6 +490,9 @@ main, header, footer { position: relative; z-index: 3; }
   border-color: rgba(255, 209, 102, 0.65);
 }
 
+/* 公告卡片里的内嵌按钮（群管考核入口） */
+.exam-entry-btn { margin-top: 12px; }
+
 .notice-icon {
   width: 52px;
   height: 52px;

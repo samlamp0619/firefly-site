@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>群管考核 · 萨姆萤光灯</title>
+  <meta name="description" content="群管理员招募考核" />
+  <!-- 考核页不要被搜索引擎收录，也不该出现在搜索结果里 -->
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="stylesheet" href="assets/fonts/fonts.css" />
+  <link rel="stylesheet" href="exam.css" />
+</head>
+<body>
+  <header class="ex-top">
+    <a class="ex-back" href="/">← 返回主页</a>
+    <div class="ex-timer" id="ex-timer" hidden>剩余 <b id="ex-clock">--:--</b></div>
+  </header>
+
+  <main class="ex-wrap">
+    <!-- 入口 / 状态屏：未开放、已结束、已提交、未开始 都显示这块 -->
+    <section class="ex-card ex-head" id="ex-gate">
+      <h1 id="ex-title">群管理员招募考核</h1>
+      <div id="ex-gate-body">
+        <p class="ex-intro" id="ex-intro"></p>
+      </div>
+    </section>
+
+    <!-- 答题区（点「开始答题」后才显示） -->
+    <div id="ex-main" hidden>
+      <section class="ex-card">
+        <h1 class="ex-sec-title" style="font-size:1.34rem">身份信息</h1>
+        <p class="ex-sec-intro">QQ 号务必准确，否则本次成绩作废。</p>
+        <div class="ex-field">
+          <label for="ex-qq">QQ 号 <i>*</i></label>
+          <input id="ex-qq" type="text" inputmode="numeric" maxlength="12"
+                 placeholder="5~12 位数字" autocomplete="off" />
+        </div>
+        <div class="ex-field">
+          <label for="ex-nick">群昵称</label>
+          <input id="ex-nick" type="text" maxlength="40" placeholder="你在群里的昵称" autocomplete="off" />
+        </div>
+      </section>
+
+      <div id="ex-sections"></div>
+
+      <section class="ex-card">
+        <h2 class="ex-sec-title" style="font-size:1.06rem">对 up 的意见或者有什么想说的</h2>
+        <textarea id="ex-feedback" class="ex-fill" maxlength="500" rows="3"
+                  placeholder="选填，可以留空"></textarea>
+      </section>
+
+      <div class="ex-submit-bar">
+        <button type="button" class="ex-btn primary" id="ex-submit">交卷</button>
+        <span class="ex-progress" id="ex-progress"></span>
+        <p class="ex-msg" id="ex-msg" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </main>
+
+  <script defer src="exam-data.js"></script>
+  <script defer src="exam.js"></script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+/* 群管考核页 · 独立样式
+ * ============================================================
+ * 刻意不引 styles.css：那套是给主页用的，带着背景图轮播/粒子/玻璃拟态，
+ * 考试页要的是「安静、能长时间阅读」，所以单独一套更轻的样式。
+ * 配色沿用主站的青绿 + 奶油色。
+ * ============================================================ */
+:root {
+  --mint: #2ec4b6;
+  --mint-deep: #1f9e92;
+  --ink: #2b3a3a;
+  --ink-soft: #6b807e;
+  --line: rgba(31, 158, 146, 0.18);
+  --card: rgba(255, 255, 255, 0.92);
+  --bg1: #f2fbfa;
+  --bg2: #fdf8ee;
+  --danger: #c8443a;
+  --ok: #2b7a4b;
+  --font-head: "ZCOOL KuaiLe", "Microsoft YaHei", sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  min-height: 100vh;
+  font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  color: var(--ink);
+  line-height: 1.75;
+  background: linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- 顶栏 ---------- */
+.ex-top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px clamp(14px, 4vw, 40px);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.ex-back {
+  font-size: 0.9rem;
+  color: var(--mint-deep);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  transition: transform 0.2s ease;
+}
+
+.ex-back:hover { transform: translateY(-1px); }
+
+.ex-timer {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.ex-timer b { color: var(--mint-deep); font-size: 1.06rem; letter-spacing: 0.03em; }
+
+/* 最后 5 分钟变红闪烁 */
+.ex-timer.is-urgent {
+  border-color: rgba(200, 68, 58, 0.5);
+  background: #fff5f4;
+}
+.ex-timer.is-urgent b { color: var(--danger); animation: ex-blink 1s steps(2, start) infinite; }
+
+@keyframes ex-blink { to { opacity: 0.45; } }
+
+/* ---------- 容器 ---------- */
+.ex-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 32px) clamp(14px, 4vw, 24px) 80px;
+}
+
+.ex-card {
+  background: var(--card);
+  border-radius: 18px;
+  box-shadow: 0 10px 34px rgba(31, 158, 146, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  padding: clamp(18px, 3vw, 30px);
+  margin-bottom: 18px;
+}
+
+/* ---------- 开场 / 状态屏 ---------- */
+.ex-head h1 {
+  font-family: var(--font-head);
+  font-weight: 400;
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
+  color: var(--mint-deep);
+  letter-spacing: 0.03em;
+  margin-bottom: 14px;
+}
+
+.ex-intro { font-size: 0.95rem; color: var(--ink); }
+
+.ex-rules {
+  margin: 16px 0 0;
+  padding-left: 1.2em;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+
+.ex-rules li { margin: 4px 0; }
+.ex-rules b { color: var(--mint-deep); }
+
+.ex-field { margin-top: 16px; }
+
+.ex-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+
+.ex-field label i { font-style: normal; color: var(--danger); }
+
+.ex-field input {
+  width: 100%;
+  padding: 11px 14px;
+  font-family: inherit;
+  font-size: 0.96rem;
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ex-field input:focus {
+  outline: none;
+  border-color: var(--mint);
+  box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.16);
+}
+
+.ex-field input::placeholder { color: #9fb3b1; }
+
+.ex-btn {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 11px 30px;
+  font-family: inherit;
+  font-size: 0.98rem;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.ex-btn.primary {
+  color: #fff;
+  background: linear-gradient(135deg, var(--mint), var(--mint-deep));
+  box-shadow: 0 10px 24px rgba(46, 196, 182, 0.35);
+}
+
+.ex-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(46, 196, 182, 0.45); }
+
+.ex-btn.ghost {
+  color: var(--mint-deep);
+  background: #fff;
+  border: 1.5px solid var(--line);
+  text-decoration: none;
+}
+
+.ex-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.ex-msg { margin-top: 12px; font-size: 0.9rem; min-height: 1.3em; }
+.ex-msg.is-err { color: var(--danger); }
+.ex-msg.is-ok { color: var(--ok); }
+
+/* ---------- 题目 ---------- */
+.ex-sec-title {
+  font-family: var(--font-head);
+  font-weight: 400;
+  font-size: 1.22rem;
+  color: var(--mint-deep);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+
+.ex-sec-intro {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+  padding-left: 12px;
+  border-left: 3px solid rgba(46, 196, 182, 0.35);
+}
+
+.ex-q {
+  padding: 16px 0;
+  border-top: 1px dashed var(--line);
+}
+
+.ex-q:first-of-type { border-top: 0; }
+
+.ex-q-stem {
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+  word-break: break-word;
+}
+
+.ex-q-no {
+  display: inline-block;
+  min-width: 3.2em;
+  font-size: 0.82rem;
+  color: var(--mint-deep);
+  font-weight: 700;
+}
+
+.ex-q-type {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 8px;
+  vertical-align: 1px;
+}
+
+.ex-opts { display: flex; flex-direction: column; gap: 7px; }
+
+.ex-opt {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 9px 13px;
+  border-radius: 11px;
+  border: 1.5px solid transparent;
+  background: rgba(46, 196, 182, 0.055);
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.ex-opt:hover { background: rgba(46, 196, 182, 0.12); }
+
+.ex-opt.is-picked {
+  background: rgba(46, 196, 182, 0.16);
+  border-color: rgba(46, 196, 182, 0.6);
+}
+
+.ex-opt input {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 3px;
+  accent-color: var(--mint-deep);
+  cursor: pointer;
+}
+
+.ex-opt span { word-break: break-word; }
+
+.ex-fill {
+  width: 100%;
+  max-width: 360px;
+  padding: 10px 13px;
+  font-family: inherit;
+  font-size: 0.94rem;
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.ex-fill:focus {
+  outline: none;
+  border-color: var(--mint);
+  box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.16);
+}
+
+textarea.ex-fill { max-width: 100%; resize: vertical; min-height: 84px; }
+
+/* ---------- 交卷区 ---------- */
+.ex-submit-bar {
+  position: sticky;
+  bottom: 0;
+  margin-top: 22px;
+  padding: 14px clamp(14px, 4vw, 24px);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+  border-radius: 18px 18px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.ex-submit-bar .ex-btn { margin-top: 0; }
+
+.ex-progress { font-size: 0.86rem; color: var(--ink-soft); }
+.ex-progress b { color: var(--mint-deep); }
+
+/* ---------- 窄屏 ---------- */
+@media (max-width: 600px) {
+  .ex-top { padding: 10px 12px; }
+  .ex-timer { font-size: 0.84rem; padding: 5px 10px; }
+  .ex-q-no { display: block; min-width: 0; margin-bottom: 2px; }
+  .ex-submit-bar { border-radius: 14px 14px 0 0; }
+  .ex-submit-bar .ex-btn { width: 100%; }
+}
