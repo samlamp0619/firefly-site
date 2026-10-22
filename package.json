@@ -1,0 +1,10 @@
+{
+  "name": "firefly-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "萨姆萤光灯个人主页：静态站点 + EdgeOne Functions（访客计数 / 歌曲投稿）",
+  "dependencies": {
+    "@edgeone/pages-blob": "^0.0.18"
+  }
+}

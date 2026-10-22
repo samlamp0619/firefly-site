@@ -1,5 +1,6 @@
 {
   "buildCommand": "node build.mjs",
+  "installCommand": "npm install",
   "headers": [
     {
       "source": "/*",

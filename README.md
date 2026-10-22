@@ -81,6 +81,62 @@ Vercount 有个**只读**接口（`GET /api/v2/log?url=...`，返回 `Data retri
 - 窄屏下自动精简为只显示「你是本站第 N 位访客」；
 - KV 是最终一致性存储（跨节点最长 60 秒），并发极高时可能少记几次，个人站完全够用。
 
+## 歌曲投稿（自建表单 + Blob 存储）
+
+原来的「歌曲投稿收集」嵌的是问卷星 iframe，现在换成了自建表单，数据存在自己的 EdgeOne Blob 里。
+
+| 部分 | 文件 |
+| --- | --- |
+| 表单界面 | `index.html` 的 `#survey` 段 + `survey.js` |
+| 提交接口 | `edge-functions/api/submit.js` → `POST /api/submit` |
+| 读取接口 | `edge-functions/api/submissions.js` → `GET /api/submissions?token=…` |
+| 本地取数 | `拉取投稿.bat` + `pull-submissions.ps1` → 生成 `投稿汇总.xlsx` |
+
+### 表单字段
+
+歌曲名 / 原唱 / 投稿人（三个必填）+「同意用于 AI 翻唱二创」勾选。
+
+### 存储
+
+- EdgeOne **Blob**，命名空间 `submissions`——**首次调用自动创建，不需要申请审核**。
+  （对比：KV 要在控制台申请并等人工审核，计数器那个到现在还没批下来。）
+- 每条投稿一个独立对象：`items/<时间戳>-<随机>.json`。
+  不用「一个总文件」是因为 **Blob 是 60 秒最终一致**，多人同时投稿时「读-改-写」同一个文件会互相覆盖丢数据。
+
+### ⚠️ 依赖与构建
+
+- 接口里 `import { getStore } from "@edgeone/pages-blob"`，所以仓库根目录有 `package.json`，
+  `edgeone.json` 里也加了 `"installCommand": "npm install"`。**`node_modules/` 不进仓库**，由构建时安装。
+- 包名是 **`@edgeone/pages-blob`**。⚠️ 官方「存储概览」文档里写成了 `@tencent/pages-blob`，
+  **那是笔误，npm 上不存在**（查过 registry，404）。
+
+### 防刷
+
+- **蜜罐字段** `website`：用 CSS 挪到屏幕外，正常人看不见；填了就说明是脚本
+  → 服务端**假装提交成功**但不落库（不给机器人任何反馈）。
+- 内容里含网址 → 拒绝（正常投稿不需要链接）。
+- 长度上限、必填校验、授权必须是布尔 `true`（`"true"` 字符串也不算）。
+
+> 这些只是「便宜的门槛」，真要刷还是能刷，个人站不值得为此上验证码。
+
+### 取数据：双击「拉取投稿.bat」
+
+调用读取接口，在本目录生成 **`投稿汇总.xlsx`**（列：序号 / 提交时间 / 歌曲名 / 原唱 / 投稿人 / 授权；
+表头冻结、**序号是数字**可直接排序）。
+
+- 令牌放在同目录的 **`submissions-token.txt`**（已在 `.gitignore` 里，不会进仓库）。
+- **⚠️ 令牌丢了就读不到数据**，请自己备份。换令牌：改 `submissions.js` 里的 `TOKEN_SHA256`
+  （仓库里只存 sha256，反推不出原文）后重新部署。
+- xlsx 是脚本自己拼 OOXML + 用 .NET 自带 ZIP 打包生成的，**不依赖 openpyxl 之类的库**，机器上什么都不用装。
+- 踩过两个坑（已修）：① PowerShell 5.1 的 `Invoke-RestMethod` 在响应头没带 `charset` 时按 Latin-1 解码，
+  中文会变乱码——改成取原始字节按 UTF-8 解；② `styles.xml` 缺 `cellStyles` 会让 Excel/openpyxl 报「没有默认样式」。
+
+### 已知的取舍
+
+- 目前**没有后台管理页面**，只能靠脚本拉 Excel。**删改某条投稿目前做不到**
+  （控制台的 Blob 只有只读浏览，删改必须通过函数）。需要的话我可以再加一个删除接口。
+- 读取接口用 `consistency: "strong"`，保证刚提交的立刻能读到，代价是稍慢一点。
+
 ## 构建与缓存（`edgeone.json` + `build.mjs`）
 
 **项目配置放在仓库里，不需要动控制台。** `edgeone.json` 会覆盖控制台的同名设置：

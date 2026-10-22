@@ -5,3 +5,12 @@
 # 例如 main.a1b2c3d4.js / styles.0f9e8d7c.css，不进仓库
 /[a-zA-Z0-9_-]*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].js
 /[a-zA-Z0-9_-]*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].css
+
+# npm 依赖（Edge Functions 用的 @edgeone/pages-blob），构建时再装
+node_modules/
+
+# 投稿管理令牌：只存本地，绝不进仓库
+submissions-token.txt
+
+# 拉取下来的投稿表格（含投稿人昵称，属于个人数据）
+投稿汇总.xlsx

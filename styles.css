@@ -897,19 +897,128 @@ main, header, footer { position: relative; z-index: 3; }
   .resource-link { margin-left: 64px; }
 }
 
-/* ===== 问卷 ===== */
+/* ===== 问卷（自建投稿表单） ===== */
 .survey-box {
-  max-width: 860px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 30px 30px 26px;
+}
+
+.survey-form {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.survey-lead {
+  font-size: 0.96rem;
+  line-height: 1.72;
+  color: var(--ink);
+}
+
+.survey-tip {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.sf-field { display: flex; flex-direction: column; gap: 6px; }
+
+.sf-field label {
+  font-size: 0.86rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+}
+
+.sf-field label i { font-style: normal; color: #e2574c; }
+
+.sf-field input[type="text"] {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(31, 158, 146, 0.28);
+  background: rgba(255, 255, 255, 0.85);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sf-field input[type="text"]::placeholder { color: var(--ink-soft); opacity: 0.65; }
+
+.sf-field input[type="text"]:focus {
+  outline: none;
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.18);
+}
+
+/* 蜜罐：挪到屏幕外。刻意不用 display:none —— 有些脚本会跳过隐藏字段 */
+.sf-hp {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 1px;
+  height: 1px;
   overflow: hidden;
 }
 
-.survey-box iframe {
-  width: 100%;
-  border: 0;
-  min-height: 620px;
-  display: block;
+.sf-agree {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 13px 15px;
+  border-radius: 12px;
+  background: rgba(46, 196, 182, 0.08);
+  border: 1px dashed rgba(31, 158, 146, 0.3);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.sf-agree input {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 3px;
+  accent-color: var(--purple);
+  cursor: pointer;
+}
+
+.sf-agree b { color: var(--purple); }
+
+.sf-submit { align-self: flex-start; min-width: 150px; margin-top: 2px; }
+
+.sf-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.sf-msg {
+  min-height: 1.4em;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.sf-msg.is-ok { color: #2b7a4b; }
+.sf-msg.is-err { color: #c8443a; }
+
+/* 深色模式（跟着表单样式放一起，方便一起改） */
+html[data-theme="dark"] .sf-field input[type="text"] {
+  background: rgba(26, 43, 48, 0.85);
+  border-color: rgba(82, 126, 120, 0.45);
+}
+
+html[data-theme="dark"] .sf-agree {
+  background: rgba(79, 208, 192, 0.1);
+  border-color: rgba(82, 126, 120, 0.45);
+}
+
+html[data-theme="dark"] .sf-msg.is-ok { color: #7fd8a3; }
+html[data-theme="dark"] .sf-msg.is-err { color: #ff9a90; }
+
+@media (max-width: 600px) {
+  .survey-box { padding: 22px 18px 20px; }
+  .sf-submit { width: 100%; min-width: 0; }
 }
 
 /* ===== 项目作品 ===== */

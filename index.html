@@ -144,11 +144,11 @@
         <h2 class="section-title reveal">公告 <span class="deco">✦</span></h2>
 
         <div class="notice-list">
-          <article class="notice-card warn glass reveal">
+          <article class="notice-card glass reveal">
             <div class="notice-icon">📥</div>
             <div class="notice-body">
-              <h3>歌曲投稿暂缓接收</h3>
-              <p>目前暂缓接收歌曲投稿，投稿已排队至 27Q2，感谢理解～</p>
+              <h3>歌曲投稿开放中</h3>
+              <p>欢迎在下方「歌曲投稿收集」提交～排期会更新到上面的发稿计划，具体以 B 站实际发布为准。</p>
             </div>
           </article>
         </div>
@@ -313,7 +313,46 @@
       <div class="container">
         <h2 class="section-title reveal">歌曲投稿收集 <span class="deco">✦</span></h2>
         <div class="survey-box glass reveal">
-          <script type='text/javascript' src='https://v.wjx.cn/handler/jqemed.ashx?activity=OUSYtjE&width=100%&source=iframe'></script>
+          <!-- 自建投稿表单：提交到 /api/submit，数据存在 EdgeOne Blob 里
+               （见 edge-functions/api/submit.js）。不再依赖问卷星。 -->
+          <form class="survey-form" id="survey-form" novalidate>
+            <p class="survey-lead">
+              想把哪首歌交给流萤唱？填在下面就好～
+              <span class="survey-tip">投稿会排进发稿计划；AI 翻唱需要先勾选授权。</span>
+            </p>
+
+            <div class="sf-field">
+              <label for="sf-song">歌曲名 <i>*</i></label>
+              <input id="sf-song" name="song" type="text" maxlength="60" required
+                     placeholder="例如：大鱼" autocomplete="off" />
+            </div>
+
+            <div class="sf-field">
+              <label for="sf-singer">原唱 <i>*</i></label>
+              <input id="sf-singer" name="singer" type="text" maxlength="60" required
+                     placeholder="例如：周深" autocomplete="off" />
+            </div>
+
+            <div class="sf-field">
+              <label for="sf-submitter">投稿人 <i>*</i></label>
+              <input id="sf-submitter" name="submitter" type="text" maxlength="40" required
+                     placeholder="你的昵称" autocomplete="off" />
+            </div>
+
+            <!-- 蜜罐：正常用户看不见这一栏，只有自动化脚本会填 -->
+            <div class="sf-hp" aria-hidden="true">
+              <label for="sf-website">网址</label>
+              <input id="sf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+
+            <label class="sf-agree">
+              <input type="checkbox" id="sf-agree" name="agree" required />
+              <span>我确认这条投稿同意用于 <b>AI 翻唱二创</b>，并在 B 站发布</span>
+            </label>
+
+            <button type="submit" class="btn btn-primary sf-submit" id="sf-submit">提交投稿</button>
+            <p class="sf-msg" id="sf-msg" role="status" aria-live="polite"></p>
+          </form>
         </div>
       </div>
     </section>
@@ -334,6 +373,7 @@
   <script defer src="videos.js"></script>
   <script defer src="projects.js"></script>
   <script defer src="schedule.js"></script>
+  <script defer src="survey.js"></script>
   <script defer src="main.js"></script>
 </body>
 </html>
