@@ -40,20 +40,22 @@ function sameHash(a, b) {
   return diff === 0;
 }
 
+/* 校验令牌：只比 sha256，仓库里没有原文 */
+async function checkToken(token) {
+  if (!token) return false;
+  try {
+    const given = await sha256Hex(token);
+    return sameHash(given, TOKEN_SHA256);
+  } catch {
+    return false;
+  }
+}
+
 export async function onRequestGet(context) {
   const url = new URL(context.request.url);
   const token = url.searchParams.get("token") || context.request.headers.get("x-token") || "";
   if (!token) return json({ ok: false, error: "缺少令牌" }, 401);
-
-  let given;
-  try {
-    given = await sha256Hex(token);
-  } catch {
-    return json({ ok: false, error: "服务器不支持摘要计算" }, 500);
-  }
-  if (!sameHash(given, TOKEN_SHA256)) {
-    return json({ ok: false, error: "令牌不正确" }, 403);
-  }
+  if (!(await checkToken(token))) return json({ ok: false, error: "令牌不正确" }, 403);
 
   try {
     const store = getStore(STORE_NAME);
@@ -71,5 +73,28 @@ export async function onRequestGet(context) {
   } catch (e) {
     console.error("[submissions] 读取失败", e && e.message, e && e.stack);
     return json({ ok: false, error: "读取失败：" + (e && e.message ? e.message : "未知错误") }, 500);
+  }
+}
+
+/* 删除一条投稿：DELETE /api/submissions?token=…&id=…
+   控制台的 Blob 只有只读浏览，删不掉东西，所以这里补一个。 */
+export async function onRequestDelete(context) {
+  const url = new URL(context.request.url);
+  const token = url.searchParams.get("token") || context.request.headers.get("x-token") || "";
+  const id = (url.searchParams.get("id") || "").trim();
+
+  if (!token) return json({ ok: false, error: "缺少令牌" }, 401);
+  if (!(await checkToken(token))) return json({ ok: false, error: "令牌不正确" }, 403);
+  if (!id) return json({ ok: false, error: "缺少 id" }, 400);
+  // id 只允许字母数字和短横线，避免拼出 ../ 之类的奇怪 key
+  if (!/^[A-Za-z0-9-]{1,64}$/.test(id)) return json({ ok: false, error: "id 格式不对" }, 400);
+
+  try {
+    const store = getStore(STORE_NAME);
+    await store.delete(`items/${id}.json`);
+    return json({ ok: true, deleted: id });
+  } catch (e) {
+    console.error("[submissions] 删除失败", e && e.message, e && e.stack);
+    return json({ ok: false, error: "删除失败：" + (e && e.message ? e.message : "未知错误") }, 500);
   }
 }
