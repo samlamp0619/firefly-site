@@ -9,7 +9,8 @@
  * ============================================================ */
 window.EXAM_DATA = {
   title: "群管理员招募考核",
-  totalPoints: 33,
+  totalPoints: 100,
+  questionCount: 33,
   openDate: "2026-10-24",
   durationMinutes: 60,
 

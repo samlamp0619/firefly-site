@@ -50,7 +50,8 @@ const KEY = {
   q4_4: { type: "single", answer: [1] },          // 梦应归于何处
   q4_5: { type: "single", answer: [1] },          // 春日手信
   q4_6: { type: "single", answer: [2] },          // 预备，起爆
-  q4_7: { type: "fill", answer: "星核猎手" },
+  // 填空题比其他题多 1 分：要靠自己回忆，没法用排除法猜
+  q4_7: { type: "fill", answer: "星核猎手", points: 4 },
   q5_1: { type: "multi", answer: [0, 1] },        // A, B
   q5_2: { type: "multi", answer: [0, 1, 2] },     // A, B, C
   q6_1: { type: "single", answer: [1] },          // 飞火之萤a
@@ -70,7 +71,19 @@ const KEY = {
   q9: { type: "single", answer: [0] },            // 已知晓，是
 };
 
-const TOTAL = Object.keys(KEY).length;   // 33
+/* ================= 分值 ================= *
+ * 试卷共 33 小问，满分 100 分。
+ * 100 不能被 33 整除，所以：每题 3 分（33×3 = 99），
+ * 再把唯一一道填空题（4-7 阵营）提到 4 分，凑满 100。
+ *   第一大题 崩铁 11 题 × 3 = 33
+ *   第二大题 流萤 11 题 × 3 + 填空 4 = 37
+ *   第三大题 群管 10 题 × 3 = 30
+ *                            合计 100
+ * 想换分值只改这里（points 不写就按 3 分算）。
+ * ============================================ */
+const DEFAULT_POINTS = 3;
+const pointsOf = k => k.points || DEFAULT_POINTS;
+const TOTAL = Object.values(KEY).reduce((sum, k) => sum + pointsOf(k), 0);   // 100
 
 function json(obj, status) {
   return new Response(JSON.stringify(obj), {
@@ -186,8 +199,9 @@ export async function onRequestPost(context) {
   const detail = {};
   for (const [qid, key] of Object.entries(KEY)) {
     const ok = judge(key, answers[qid]);
-    if (ok) score++;
-    detail[qid] = ok ? 1 : 0;
+    const pts = pointsOf(key);
+    if (ok) score += pts;
+    detail[qid] = ok ? pts : 0;   // 存每题得了多少分，比 0/1 更好用
   }
 
   const record = {

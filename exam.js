@@ -211,7 +211,13 @@
       const data = await r.json().catch(() => null);
 
       if (!r.ok || !data || !data.ok) {
-        const msg = (data && data.error) || "开启失败，请刷新重试";
+        let msg = (data && data.error) || "开启失败，请刷新重试";
+        // 预览链接最常见的坑：令牌复制时被截断，看到的是「尚未开放」，
+        // 容易误以为页面打不开。这里说清楚。
+        if (PREVIEW && data && data.code === "NOT_OPEN") {
+          msg = "预览令牌不正确或已过期。正式开放时间是 10 月 24 日 00:00，" +
+                "届时直接打开 https://samlamp.top/exam.html 即可参加。";
+        }
         gate('<p class="ex-intro">' + esc(msg) + '</p><a class="ex-btn ghost" href="/">返回主页</a>');
         return;
       }
@@ -367,10 +373,11 @@
     $("ex-intro").textContent = D.intro;
     $("ex-gate-body").insertAdjacentHTML("beforeend",
       '<ul class="ex-rules">' +
-      "<li>共 <b>" + allQuestions().length + "</b> 小题，每题 1 分，满分 <b>" + D.totalPoints + "</b> 分</li>" +
+      "<li>共 <b>" + allQuestions().length + "</b> 小题，满分 <b>" + D.totalPoints + "</b> 分" +
+      "（每题 3 分，填空 4 分）</li>" +
       "<li>限时 <b>60 分钟</b>，点下面的按钮后开始倒计时，时间到自动收卷</li>" +
       "<li>每题只有一次机会，交卷后不可修改</li>" +
-      "<li>答案请自己思考，<b>不要使用 AI 辅助</b>，发现即取消资格</li>" +
+      "<li>选择题<b>多选、少选都不得分</b>；答案请自己思考，<b>不要使用 AI 辅助</b>，发现即取消资格</li>" +
       "</ul>" +
       '<button type="button" class="ex-btn primary" id="ex-begin">开始答题</button>' +
       '<p class="ex-intro" style="margin-top:12px;color:var(--ink-soft);font-size:.84rem">' +
