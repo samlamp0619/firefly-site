@@ -67,6 +67,8 @@ export async function onRequestGet(context) {
           startedAt: rec.startedAt,
           submittedAt: rec.submittedAt,
           durationSec: rec.durationSec,
+          // ⚠️ 这个字段必须带上：导出脚本靠它区分「预览自测」和「正式答卷」
+          preview: rec.preview === true,
           feedback: rec.feedback || "",
         });
       }
