@@ -76,9 +76,16 @@ const KEY = {
    内容照样存进 record.feedback，导出的成绩表里会带出来，供人工阅读。 */
 const FEEDBACK_POINTS = 0;
 
-/* 满分 = 各题分值之和 + 开放题。当前 32.5 + 49 + 14 + 0.5 + 0 = 96 */
+/* 满分：**固定按 100 计**（卷面写的就是 100 分制）。
+   注意 33 道题的分值合计只有 96（32.5 + 49 + 14 + 0.5），
+   开放题又不计分，所以实际作答最高就是 96/100。
+   这是刻意选的方案（保留 100 分制的显示方式）。 */
+const TOTAL = 100;
+
+/* 各题分值求和，仅用于自检/日志，不参与满分计算 */
 const pointsOf = k => (typeof k.points === "number" ? k.points : 0);
-const TOTAL = Object.values(KEY).reduce((sum, k) => sum + pointsOf(k), 0) + FEEDBACK_POINTS;
+const RAW_SUM = Object.values(KEY).reduce((sum, k) => sum + pointsOf(k), 0) + FEEDBACK_POINTS;
+if (RAW_SUM !== 96) console.warn("[exam-submit] 注意：题目分值合计为", RAW_SUM);
 
 function json(obj, status) {
   return new Response(JSON.stringify(obj), {
