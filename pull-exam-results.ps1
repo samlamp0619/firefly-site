@@ -102,8 +102,9 @@ function Row([int]$r, [string[]]$vals, [int]$style) {
 }
 
 # 数据行：A=序号(数字) B=QQ号(文本，防止 Excel 显示成科学计数法)
-#         D=分数(数字) G=用时(数字) 其余文本
-function DataRow([int]$r, [int]$idx, [string]$qq, [string]$nick, [int]$score,
+#         D=分数(数字，**必须是小数**——考核有 1.5 / 0.5 分，用 int 会被截断)
+#         G=用时(数字) 其余文本
+function DataRow([int]$r, [int]$idx, [string]$qq, [string]$nick, $score,
                  [string]$rate, [string]$when, [int]$mins, [string]$note) {
     $cells  = (CellNum ("A" + $r) $idx 0)
     $cells += (Cell    ("B" + $r) $qq 0)
@@ -129,8 +130,10 @@ foreach ($it in $items) {
     $mins = 0
     try { $mins = [int][math]::Round([double]$it.durationSec / 60) } catch {}
     $note = if ($it.preview) { "预览（自测，不计入）" } else { "" }
+    # 分数直接用原值（可能是 98.5 这种小数），不要转 int
+    $score = [double]$it.score
     $rowsXml += (DataRow ($n + 1) $n ([string]$it.qq) ([string]$it.nickname) `
-                 ([int]$it.score) (([string]$it.percent) + "%") $when $mins $note)
+                 $score (([string]$it.percent) + "%") $when $mins $note)
 }
 
 $sheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
