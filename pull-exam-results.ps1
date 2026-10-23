@@ -6,7 +6,8 @@
 # 需要同目录下有 submissions-token.txt（和投稿接口共用一个管理令牌）。
 #
 # 输出：考核成绩.xlsx
-#   序号 / QQ号 / 群昵称 / 分数 / 得分率 / 提交时间 / 用时(分钟) / 备注
+#   序号 / QQ号 / 群昵称 / 分数 / 得分率 / 提交时间 / 用时(分钟) / 意见 / 备注
+#   「意见」是开放题的原文（该题不计分，只是把内容带出来给群主看）
 #   按分数从高到低排；标了「预览」的是开考前自测的记录，正式统计时忽略。
 # ============================================================
 
@@ -103,9 +104,9 @@ function Row([int]$r, [string[]]$vals, [int]$style) {
 
 # 数据行：A=序号(数字) B=QQ号(文本，防止 Excel 显示成科学计数法)
 #         D=分数(数字，**必须是小数**——考核有 1.5 / 0.5 分，用 int 会被截断)
-#         G=用时(数字) 其余文本
+#         G=用时(数字) H=意见(开放题原文) I=备注 其余文本
 function DataRow([int]$r, [int]$idx, [string]$qq, [string]$nick, $score,
-                 [string]$rate, [string]$when, [int]$mins, [string]$note) {
+                 [string]$rate, [string]$when, [int]$mins, [string]$opinion, [string]$note) {
     $cells  = (CellNum ("A" + $r) $idx 0)
     $cells += (Cell    ("B" + $r) $qq 0)
     $cells += (Cell    ("C" + $r) $nick 0)
@@ -113,11 +114,12 @@ function DataRow([int]$r, [int]$idx, [string]$qq, [string]$nick, $score,
     $cells += (Cell    ("E" + $r) $rate 0)
     $cells += (Cell    ("F" + $r) $when 0)
     $cells += (CellNum ("G" + $r) $mins 0)
-    $cells += (Cell    ("H" + $r) $note 0)
+    $cells += (Cell    ("H" + $r) $opinion 2)   # 2 = 自动换行
+    $cells += (Cell    ("I" + $r) $note 0)
     return '<row r="' + $r + '">' + $cells + '</row>'
 }
 
-$headers = @("序号", "QQ号", "群昵称", "分数", "得分率", "提交时间", "用时(分钟)", "备注")
+$headers = @("序号", "QQ号", "群昵称", "分数", "得分率", "提交时间", "用时(分钟)", "意见", "备注")
 $rowsXml = Row 1 $headers 1
 
 $n = 0
@@ -130,10 +132,12 @@ foreach ($it in $items) {
     $mins = 0
     try { $mins = [int][math]::Round([double]$it.durationSec / 60) } catch {}
     $note = if ($it.preview) { "预览（自测，不计入）" } else { "" }
+    # 开放题「对 up 的意见」不计分，但原文要带出来
+    $opinion = if ($it.feedback) { [string]$it.feedback } else { "" }
     # 分数直接用原值（可能是 98.5 这种小数），不要转 int
     $score = [double]$it.score
     $rowsXml += (DataRow ($n + 1) $n ([string]$it.qq) ([string]$it.nickname) `
-                 $score (([string]$it.percent) + "%") $when $mins $note)
+                 $score (([string]$it.percent) + "%") $when $mins $opinion $note)
 }
 
 $sheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
@@ -141,7 +145,7 @@ $sheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
 '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' +
 '<cols><col min="1" max="1" width="7"/><col min="2" max="2" width="16"/><col min="3" max="3" width="20"/>' +
 '<col min="4" max="4" width="8"/><col min="5" max="5" width="10"/><col min="6" max="6" width="19"/>' +
-'<col min="7" max="7" width="12"/><col min="8" max="8" width="22"/></cols>' +
+'<col min="7" max="7" width="12"/><col min="8" max="8" width="52"/><col min="9" max="9" width="22"/></cols>' +
 '<sheetData>' + $rowsXml + '</sheetData></worksheet>'
 
 $contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
@@ -175,8 +179,10 @@ $stylesXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
 '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>' +
 '<borders count="1"><border/></borders>' +
 '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
-'<cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
-'<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs>' +
+'<cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
+'<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1">' +
+'<alignment wrapText="1" vertical="top"/></xf></cellXfs>' +
 '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>' +
 '</styleSheet>'
 

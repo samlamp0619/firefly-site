@@ -390,7 +390,7 @@
       "<li>限时 <b>60 分钟</b>，点下面的按钮后开始倒计时，时间到自动收卷</li>" +
       "<li>每题只有一次机会，交卷后不可修改</li>" +
       "<li>选择题<b>多选、少选都不得分</b>；答案请自己思考，<b>不要使用 AI 辅助</b>，发现即取消资格</li>" +
-      "<li>末尾「对 up 的意见」写了就有 <b>" + ((D.openQuestion && D.openQuestion.points) || 4) + "</b> 分</li>" +
+      "<li>末尾「对 up 的意见」<b>不计分</b>，但会连同成绩一起交给群主看</li>" +
       "</ul>" +
       '<button type="button" class="ex-btn primary" id="ex-begin">开始答题</button>' +
       '<p class="ex-intro" style="margin-top:12px;color:var(--ink-soft);font-size:.84rem">' +

@@ -13,7 +13,9 @@
  * ============================================================ */
 window.EXAM_DATA = {
   title: "群管理员招募考核",
-  totalPoints: 100,
+  /* 满分 = 33 道题的分值合计（32.5 + 49 + 14 + 0.5）。
+     末尾的「对 up 的意见」不计分，所以不计入满分。 */
+  totalPoints: 96,
   questionCount: 33,
   openDate: "2026-10-24",
   durationMinutes: 60,
@@ -323,11 +325,11 @@ window.EXAM_DATA = {
     },
   ],
 
-  /* 开放题：不计对错，写了就给分（分值见 points） */
+  /* 开放题：**不计分**，内容只为让管理者了解想法，会随成绩一起导出 */
   openQuestion: {
     id: "feedback",
     stem: "对 up 的意见或者有什么想说的",
-    placeholder: "选填。写点真实想法就有 4 分",
-    points: 4,
+    placeholder: "选填。不计分，但会连同成绩一起交给群主看",
+    points: 0,
   },
 };

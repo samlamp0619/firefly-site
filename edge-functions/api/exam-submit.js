@@ -72,10 +72,11 @@ const KEY = {
   q9: { type: "single", answer: [0], points: 0.5 },        // 已知晓，是
 };
 
-/* 开放题「对 up 的意见」：不计对错，写点东西就给分 */
-const FEEDBACK_POINTS = 4;
+/* 开放题「对 up 的意见」：**不计分**（全都给 0 分）。
+   内容照样存进 record.feedback，导出的成绩表里会带出来，供人工阅读。 */
+const FEEDBACK_POINTS = 0;
 
-/* 满分 = 各题分值之和 + 开放题。当前 32.5 + 49 + 14 + 0.5 + 4 = 100 */
+/* 满分 = 各题分值之和 + 开放题。当前 32.5 + 49 + 14 + 0.5 + 0 = 96 */
 const pointsOf = k => (typeof k.points === "number" ? k.points : 0);
 const TOTAL = Object.values(KEY).reduce((sum, k) => sum + pointsOf(k), 0) + FEEDBACK_POINTS;
 
@@ -89,8 +90,19 @@ function json(obj, status) {
   });
 }
 
+/* 单行字段的清洗：控制字符（含换行）全部去掉 */
 function clean(v, max) {
   const s = String(v == null ? "" : v).replace(/[\u0000-\u001f\u007f]/g, "").trim();
+  return max ? s.slice(0, max) : s;
+}
+
+/* 多行字段（开放题）的清洗：**保留换行**，只去掉其它控制字符，
+   否则用户分几行写的内容会被粘成一行、看不清。 */
+function cleanMulti(v, max) {
+  const s = String(v == null ? "" : v)
+    .replace(/\r\n?/g, "\n")                                        // 统一成 \n
+    .replace(/[\u0000-\u0009\u000b\u000c\u000e-\u001f\u007f]/g, "")  // 保留 \t \n
+    .trim();
   return max ? s.slice(0, max) : s;
 }
 
@@ -127,7 +139,7 @@ export async function onRequestPost(context) {
   const sessionId = clean(body.sessionId, 40);
   const qq = clean(body.qq, 20).replace(/\D/g, "");
   const nickname = clean(body.nickname, 40);
-  const feedback = clean(body.feedback, 500);
+  const feedback = cleanMulti(body.feedback, 500);
   const answers = body.answers && typeof body.answers === "object" ? body.answers : {};
 
   if (!/^\d{5,12}$/.test(qq)) {
@@ -198,10 +210,15 @@ export async function onRequestPost(context) {
     detail[qid] = ok ? pts : 0;   // 存每题得了多少分，比 0/1 更好用
   }
 
-  /* 开放题「对 up 的意见」：不看内容质量，写了就给分（空的才 0 分） */
-  const wroteFeedback = feedback.length > 0;
-  if (wroteFeedback) score += FEEDBACK_POINTS;
-  detail.feedback = wroteFeedback ? FEEDBACK_POINTS : 0;
+  /* 开放题「对 up 的意见」不计分（当前分值 0）；
+     内容已经存进 record.feedback，导出表格里会带上 */
+  if (FEEDBACK_POINTS > 0) {
+    const wroteFeedback = feedback.length > 0;
+    if (wroteFeedback) score += FEEDBACK_POINTS;
+    detail.feedback = wroteFeedback ? FEEDBACK_POINTS : 0;
+  } else {
+    detail.feedback = 0;
+  }
 
   // 1.5 / 0.5 这种小数分累加后可能有浮点误差，收敛到 1 位小数
   score = Math.round(score * 10) / 10;
@@ -231,6 +248,7 @@ export async function onRequestPost(context) {
 
   return json({
     ok: true,
+    id: sessionId,          // 方便排查 / 定位这一份答卷
     score,
     total: TOTAL,
     percent: record.percent,
