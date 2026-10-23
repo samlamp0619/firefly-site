@@ -30,60 +30,54 @@ const GRACE_MS = 90 * 1000;   // 网络抖动宽限
  * 例如 q1_2: [0, 2] 表示选 A 和 C。
  * ============================================ */
 const KEY = {
-  // 第一大题：崩铁
-  q1_1: { type: "single", answer: [0] },          // 18
-  q1_2: { type: "multi", answer: [0, 2] },        // A, C
-  q1_3: { type: "single", answer: [3] },          // D 比格椰 —— 流光萤萤
-  q1_4: { type: "multi", answer: [1, 2] },        // B, C
-  q2_1: { type: "single", answer: [2] },          // C 战斗
-  q2_2: { type: "single", answer: [2] },          // C
-  q2_3: { type: "multi", answer: [1, 2] },        // B, C
-  q3_1: { type: "single", answer: [3] },          // D 派对车厢
-  q3_2: { type: "multi", answer: [1, 2] },        // B, C
-  q3_3: { type: "multi", answer: [1, 2, 3] },     // B, C, D
-  q3_4: { type: "single", answer: [1] },          // B
+  // ---------- 第一大题：崩铁（11 题，合计 32.5）----------
+  q1_1: { type: "single", answer: [0], points: 2 },        // 18
+  q1_2: { type: "multi", answer: [0, 2], points: 4 },      // A, C
+  q1_3: { type: "single", answer: [3], points: 3 },        // D 比格椰 —— 流光萤萤
+  q1_4: { type: "multi", answer: [1, 2], points: 4 },      // B, C
+  q2_1: { type: "single", answer: [2], points: 2 },        // C 战斗
+  q2_2: { type: "single", answer: [2], points: 3 },        // C
+  q2_3: { type: "multi", answer: [1, 2], points: 4 },      // B, C
+  q3_1: { type: "single", answer: [3], points: 2 },        // D 派对车厢
+  q3_2: { type: "multi", answer: [1, 2], points: 4 },      // B, C
+  q3_3: { type: "multi", answer: [1, 2, 3], points: 1.5 }, // B, C, D
+  q3_4: { type: "single", answer: [1], points: 3 },        // B
 
-  // 第二大题：流萤
-  q4_1: { type: "single", answer: [2] },          // 24.06.19
-  q4_2: { type: "single", answer: [1] },          // 自破碎的天空坠落
-  q4_3: { type: "single", answer: [0] },          // 荡除蠹灾的铁骑
-  q4_4: { type: "single", answer: [1] },          // 梦应归于何处
-  q4_5: { type: "single", answer: [1] },          // 春日手信
-  q4_6: { type: "single", answer: [2] },          // 预备，起爆
-  // 填空题比其他题多 1 分：要靠自己回忆，没法用排除法猜
-  q4_7: { type: "fill", answer: "星核猎手", points: 4 },
-  q5_1: { type: "multi", answer: [0, 1] },        // A, B
-  q5_2: { type: "multi", answer: [0, 1, 2] },     // A, B, C
-  q6_1: { type: "single", answer: [1] },          // 飞火之萤a
-  q6_2: { type: "single", answer: [3] },          // 100 亿
-  q6_3: { type: "single", answer: [3] },          // UVR5 + so-vits-svc
+  // ---------- 第二大题：流萤（12 题，合计 49）----------
+  q4_1: { type: "single", answer: [2], points: 5 },        // 24.06.19
+  q4_2: { type: "single", answer: [1], points: 5 },        // 自破碎的天空坠落
+  q4_3: { type: "single", answer: [0], points: 5 },        // 荡除蠹灾的铁骑
+  q4_4: { type: "single", answer: [1], points: 3 },        // 梦应归于何处
+  q4_5: { type: "single", answer: [1], points: 5 },        // 春日手信
+  q4_6: { type: "single", answer: [2], points: 3 },        // 预备，起爆
+  q4_7: { type: "fill", answer: "星核猎手", points: 2 },
+  q5_1: { type: "multi", answer: [0, 1], points: 4 },      // A, B
+  q5_2: { type: "multi", answer: [0, 1, 2], points: 6 },   // A, B, C
+  q6_1: { type: "single", answer: [1], points: 3 },        // 飞火之萤a
+  q6_2: { type: "single", answer: [3], points: 2 },        // 100 亿
+  q6_3: { type: "single", answer: [3], points: 6 },        // UVR5 + so-vits-svc
 
-  // 第三大题：群管理
-  q7_1: { type: "single", answer: [1] },          // B 删除违规内容并私信警告
-  q7_2: { type: "single", answer: [2] },          // C 上报群主并临时禁言
-  q7_3: { type: "single", answer: [0] },          // A 私信提醒
-  q7_4: { type: "multi", answer: [1, 2] },        // B, C
-  q7_5: { type: "multi", answer: [1, 3] },        // B, D
-  q8_1: { type: "single", answer: [1] },          // 错
-  q8_2: { type: "single", answer: [1] },          // 错
-  q8_3: { type: "single", answer: [0] },          // 对
-  q8_4: { type: "single", answer: [1] },          // 错
-  q9: { type: "single", answer: [0] },            // 已知晓，是
+  // ---------- 第三大题：群管（9 题，合计 14）----------
+  q7_1: { type: "single", answer: [1], points: 2 },        // B 删除违规内容并私信警告
+  q7_2: { type: "single", answer: [2], points: 2 },        // C 上报群主并临时禁言
+  q7_3: { type: "single", answer: [0], points: 2 },        // A 私信提醒
+  q7_4: { type: "multi", answer: [1, 2], points: 2 },      // B, C
+  q7_5: { type: "multi", answer: [1, 3], points: 2 },      // B, D
+  q8_1: { type: "single", answer: [1], points: 1 },        // 错
+  q8_2: { type: "single", answer: [1], points: 1 },        // 错
+  q8_3: { type: "single", answer: [0], points: 1 },        // 对
+  q8_4: { type: "single", answer: [1], points: 1 },        // 错
+
+  // ---------- 意向确认（0.5）----------
+  q9: { type: "single", answer: [0], points: 0.5 },        // 已知晓，是
 };
 
-/* ================= 分值 ================= *
- * 试卷共 33 小问，满分 100 分。
- * 100 不能被 33 整除，所以：每题 3 分（33×3 = 99），
- * 再把唯一一道填空题（4-7 阵营）提到 4 分，凑满 100。
- *   第一大题 崩铁 11 题 × 3 = 33
- *   第二大题 流萤 11 题 × 3 + 填空 4 = 37
- *   第三大题 群管 10 题 × 3 = 30
- *                            合计 100
- * 想换分值只改这里（points 不写就按 3 分算）。
- * ============================================ */
-const DEFAULT_POINTS = 3;
-const pointsOf = k => k.points || DEFAULT_POINTS;
-const TOTAL = Object.values(KEY).reduce((sum, k) => sum + pointsOf(k), 0);   // 100
+/* 开放题「对 up 的意见」：不计对错，写点东西就给分 */
+const FEEDBACK_POINTS = 4;
+
+/* 满分 = 各题分值之和 + 开放题。当前 32.5 + 49 + 14 + 0.5 + 4 = 100 */
+const pointsOf = k => (typeof k.points === "number" ? k.points : 0);
+const TOTAL = Object.values(KEY).reduce((sum, k) => sum + pointsOf(k), 0) + FEEDBACK_POINTS;
 
 function json(obj, status) {
   return new Response(JSON.stringify(obj), {
@@ -203,6 +197,14 @@ export async function onRequestPost(context) {
     if (ok) score += pts;
     detail[qid] = ok ? pts : 0;   // 存每题得了多少分，比 0/1 更好用
   }
+
+  /* 开放题「对 up 的意见」：不看内容质量，写了就给分（空的才 0 分） */
+  const wroteFeedback = feedback.length > 0;
+  if (wroteFeedback) score += FEEDBACK_POINTS;
+  detail.feedback = wroteFeedback ? FEEDBACK_POINTS : 0;
+
+  // 1.5 / 0.5 这种小数分累加后可能有浮点误差，收敛到 1 位小数
+  score = Math.round(score * 10) / 10;
 
   const record = {
     id: sessionId,

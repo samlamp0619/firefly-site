@@ -17,3 +17,6 @@ submissions-token.txt
 
 # 考核成绩表（含 QQ 号，属于个人信息）
 考核成绩.xlsx
+
+# Python 缓存（跑 build_font.py 时会生成）
+__pycache__/

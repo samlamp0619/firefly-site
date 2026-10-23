@@ -73,8 +73,9 @@
   function renderQ(q) {
     let h = '<div class="ex-q" data-qid="' + esc(q.id) + '">';
     h += '<div class="ex-q-stem"><span class="ex-q-no">' + esc(q.no) + "</span>" +
-         '<span class="ex-q-type">' + (TYPE_LABEL[q.type] || "单选") + "</span><br>" +
-         esc(q.stem) + "</div>";
+         '<span class="ex-q-type">' + (TYPE_LABEL[q.type] || "单选") + "</span>" +
+         (typeof q.points === "number" ? '<span class="ex-q-pts">' + q.points + " 分</span>" : "") +
+         "<br>" + esc(q.stem) + "</div>";
 
     if (q.type === "fill") {
       h += '<input class="ex-fill" type="text" data-fill="' + esc(q.id) + '" maxlength="40" ' +
@@ -99,30 +100,38 @@
       html += '<section class="ex-card">';
       html += '<h2 class="ex-sec-title">' + esc(sec.title) + "</h2>";
       if (sec.intro) html += '<p class="ex-sec-intro">' + esc(sec.intro) + "</p>";
-      for (const q of sec.questions) html += renderQ(q);
+      // 大题下面按「题组」排列：题组说明单独一行（几个小问共用的背景），
+      // 不能并进第（1）小问的题干里
+      for (const g of sec.groups) {
+        if (g.heading) html += '<p class="ex-group">' + esc(g.heading) + "</p>";
+        for (const q of g.questions) html += renderQ(q);
+      }
       html += "</section>";
     }
     $("ex-sections").innerHTML = html;
 
     // 回填草稿
     const ans = state.answers || {};
-    for (const sec of D.sections) {
-      for (const q of sec.questions) {
-        const v = ans[q.id];
-        if (q.type === "fill") {
-          const el = document.querySelector('[data-fill="' + q.id + '"]');
-          if (el && typeof v === "string") el.value = v;
-        } else if (Array.isArray(v)) {
-          for (const i of v) {
-            const cb = document.querySelector('input[data-q="' + q.id + '"][value="' + i + '"]');
-            if (cb) cb.checked = true;
-          }
+    for (const q of allQuestions()) {
+      const v = ans[q.id];
+      if (q.type === "fill") {
+        const el = document.querySelector('[data-fill="' + q.id + '"]');
+        if (el && typeof v === "string") el.value = v;
+      } else if (Array.isArray(v)) {
+        for (const i of v) {
+          const cb = document.querySelector('input[data-q="' + q.id + '"][value="' + i + '"]');
+          if (cb) cb.checked = true;
         }
       }
     }
     if (typeof state.feedback === "string") $("ex-feedback").value = state.feedback;
     if (typeof state.qq === "string") $("ex-qq").value = state.qq;
     if (typeof state.nick === "string") $("ex-nick").value = state.nick;
+
+    // 开放题的占位提示（含分值）由题库提供，避免文案两处维护
+    if (D.openQuestion && D.openQuestion.placeholder) {
+      $("ex-feedback").placeholder = D.openQuestion.placeholder;
+    }
 
     syncPicked();
     updateProgress();
@@ -139,23 +148,26 @@
   /* ---------------- 答案收集与进度 ---------------- */
   function collect() {
     const answers = {};
-    for (const sec of D.sections) {
-      for (const q of sec.questions) {
-        if (q.type === "fill") {
-          const el = document.querySelector('[data-fill="' + q.id + '"]');
-          answers[q.id] = el ? el.value.trim() : "";
-        } else {
-          const picked = [...document.querySelectorAll('input[data-q="' + q.id + '"]:checked')];
-          answers[q.id] = picked.map(p => Number(p.value));
-        }
+    for (const q of allQuestions()) {
+      if (q.type === "fill") {
+        const el = document.querySelector('[data-fill="' + q.id + '"]');
+        answers[q.id] = el ? el.value.trim() : "";
+      } else {
+        const picked = [...document.querySelectorAll('input[data-q="' + q.id + '"]:checked')];
+        answers[q.id] = picked.map(p => Number(p.value));
       }
     }
     return answers;
   }
 
+  /* 所有小问拉平成一个数组（题组说明不算题） */
   function allQuestions() {
     const out = [];
-    for (const sec of D.sections) for (const q of sec.questions) out.push(q);
+    for (const sec of D.sections) {
+      for (const g of sec.groups) {
+        for (const q of g.questions) out.push(q);
+      }
+    }
     return out;
   }
 
@@ -374,10 +386,11 @@
     $("ex-gate-body").insertAdjacentHTML("beforeend",
       '<ul class="ex-rules">' +
       "<li>共 <b>" + allQuestions().length + "</b> 小题，满分 <b>" + D.totalPoints + "</b> 分" +
-      "（每题 3 分，填空 4 分）</li>" +
+      "（每题分值标在题号后面）</li>" +
       "<li>限时 <b>60 分钟</b>，点下面的按钮后开始倒计时，时间到自动收卷</li>" +
       "<li>每题只有一次机会，交卷后不可修改</li>" +
       "<li>选择题<b>多选、少选都不得分</b>；答案请自己思考，<b>不要使用 AI 辅助</b>，发现即取消资格</li>" +
+      "<li>末尾「对 up 的意见」写了就有 <b>" + ((D.openQuestion && D.openQuestion.points) || 4) + "</b> 分</li>" +
       "</ul>" +
       '<button type="button" class="ex-btn primary" id="ex-begin">开始答题</button>' +
       '<p class="ex-intro" style="margin-top:12px;color:var(--ink-soft);font-size:.84rem">' +

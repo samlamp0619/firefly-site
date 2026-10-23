@@ -15,7 +15,12 @@
   --bg2: #fdf8ee;
   --danger: #c8443a;
   --ok: #2b7a4b;
-  --font-head: "ZCOOL KuaiLe", "Microsoft YaHei", sans-serif;
+  /* ⚠️ 考核页刻意**不用站酷快乐体**：
+     主站的标题字体是按站点文案做的子集（Google Fonts 的 text= 参数），
+     考核页有大量新字（招募 / 考核 / 崩铁 / 贪饕 / 仲裁 …）不在子集里，
+     而把子集扩大会触发 Google 静默丢字形，导致标题里字体混杂。
+     这里直接用系统字体：字形一定齐，长题干读起来也更稳。 */
+  --font-head: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -199,12 +204,36 @@ body {
   border-left: 3px solid rgba(46, 196, 182, 0.35);
 }
 
-.ex-q {
-  padding: 16px 0;
+/* 题组说明：同一大题下几个小问共用的背景，必须单独成行 */
+.ex-group {
+  margin: 20px 0 2px;
+  padding-top: 15px;
   border-top: 1px dashed var(--line);
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.72;
+  color: var(--ink);
 }
 
-.ex-q:first-of-type { border-top: 0; }
+.ex-group:first-of-type { border-top: 0; padding-top: 0; margin-top: 4px; }
+
+.ex-q {
+  padding: 13px 0 5px;
+}
+
+/* 每题分值标签 */
+.ex-q-pts {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 8px;
+  font-size: 0.72rem;
+  color: var(--mint-deep);
+  border: 1px solid rgba(46, 196, 182, 0.42);
+  background: rgba(46, 196, 182, 0.1);
+  border-radius: 999px;
+  vertical-align: 1px;
+  font-variant-numeric: tabular-nums;
+}
 
 .ex-q-stem {
   font-size: 0.95rem;
