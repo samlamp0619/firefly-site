@@ -89,6 +89,7 @@
       '<a class="latest-link" href="' + esc(v.url) + '" target="_blank" rel="noopener">' +
         '<span class="latest-cover">' +
           '<img src="' + esc(thumb(v.cover, 640, 400)) + '" alt="" loading="lazy" ' +
+               'referrerpolicy="no-referrer" ' +
                'onerror="this.style.opacity=0" />' +
           '<span class="latest-badge">最新投稿</span>' +
         '</span>' +
@@ -154,6 +155,7 @@
         esc(v.title) + '">' +
         '<span class="work-cover">' +
           '<img src="' + esc(thumb(v.cover, 400, 225)) + '" alt="" loading="lazy" ' +
+               'referrerpolicy="no-referrer" ' +
                'onerror="this.style.opacity=0" />' +
           (fmtDur(v.duration) ? '<span class="work-dur">' + fmtDur(v.duration) + '</span>' : '') +
         '</span>' +

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>萨姆萤光灯</title>
   <meta name="description" content="一只高三萤厨，只做流萤翻唱的小 up 主。" />
-  <meta name="theme-color" content="#fdf2ff" />
+  <meta name="theme-color" content="#0d181c" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>" />
 
   <!-- 分享预览（QQ / 微信 / B站私信 等）。
@@ -36,13 +36,15 @@
        否则深色模式下会先闪一下白底再变暗。 -->
   <script>
     (function () {
-      var dark = false;
+      /* 默认深色：没有手动切换过的访客一律进深色；切过就按他选的来。 */
+      var dark = true;
       try {
         var saved = localStorage.getItem("theme");
-        dark = saved ? saved === "dark"
-                     : window.matchMedia("(prefers-color-scheme: dark)").matches;
-      } catch (e) { /* 无 localStorage 时按浅色走 */ }
+        if (saved) dark = saved === "dark";
+      } catch (e) { /* 无 localStorage 时按默认深色走 */ }
       document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+      var m = document.querySelector('meta[name="theme-color"]');
+      if (m) m.setAttribute("content", dark ? "#0d181c" : "#fdf2ff");
     })();
   </script>
 </head>
