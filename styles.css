@@ -412,6 +412,9 @@ main, header, footer { position: relative; z-index: 3; }
 
 /* ===== 关于我 ===== */
 .about-card {
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
   display: grid;
   grid-template-columns: 220px 1fr;
   gap: 34px;
@@ -467,8 +470,11 @@ main, header, footer { position: relative; z-index: 3; }
 /* ===== 公告 ===== */
 .notice-list {
   display: grid;
+  /* 卡片统一到 1000 后，公告这种短文本并排放，右侧才不会空一大块；
+     只有一条时会自动铺满整行（auto-fit 会折叠空轨道） */
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 20px;
-  max-width: 860px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -554,14 +560,14 @@ main, header, footer { position: relative; z-index: 3; }
 /* ===== 发稿计划（日历视图） ===== */
 /* 配色约定：过去=灰、今天=黄、未来=绿（与 schedule.js 的 is-past / is-today / is-future 对应） */
 .schedule-card {
-  max-width: 1080px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 24px 22px 18px;
 }
 
 .sched-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
@@ -654,7 +660,7 @@ main, header, footer { position: relative; z-index: 3; }
 
 .cal-song {
   width: 100%;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -809,7 +815,7 @@ main, header, footer { position: relative; z-index: 3; }
 
 /* ===== 资源 ===== */
 .resource-head {
-  max-width: 860px;
+  max-width: 1000px;
   margin: 0 auto 24px;
   padding: 26px 28px;
 }
@@ -834,7 +840,7 @@ main, header, footer { position: relative; z-index: 3; }
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
-  max-width: 860px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -902,17 +908,26 @@ main, header, footer { position: relative; z-index: 3; }
 
 /* ===== 问卷（自建投稿表单） ===== */
 .survey-box {
-  max-width: 720px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 30px 30px 26px;
 }
 
 .survey-form {
+  /* 卡片统一到 1000 后，三个短字段（歌曲名/原唱/投稿人）并成一行三列，
+     既填满了卡片宽度，又不至于把输入框拉成一条长条。 */
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 18px;
+  row-gap: 16px;
 }
+
+/* 说明、勾选、按钮、提示这几块横跨整行 */
+.survey-lead,
+.sf-agree,
+.sf-submit,
+.sf-msg { grid-column: 1 / -1; }
 
 .survey-lead {
   font-size: 0.96rem;
@@ -992,7 +1007,7 @@ main, header, footer { position: relative; z-index: 3; }
 
 .sf-agree b { color: var(--purple); }
 
-.sf-submit { align-self: flex-start; min-width: 150px; margin-top: 2px; }
+.sf-submit { justify-self: start; min-width: 150px; margin-top: 2px; }
 
 .sf-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
@@ -1019,6 +1034,11 @@ html[data-theme="dark"] .sf-agree {
 html[data-theme="dark"] .sf-msg.is-ok { color: #7fd8a3; }
 html[data-theme="dark"] .sf-msg.is-err { color: #ff9a90; }
 
+/* 窄一些就退回单列，三个输入框不至于挤在一起 */
+@media (max-width: 760px) {
+  .survey-form { grid-template-columns: minmax(0, 1fr); }
+}
+
 @media (max-width: 600px) {
   .survey-box { padding: 22px 18px 20px; }
   .sf-submit { width: 100%; min-width: 0; }
@@ -1029,7 +1049,7 @@ html[data-theme="dark"] .sf-msg.is-err { color: #ff9a90; }
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
-  max-width: 860px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -1093,7 +1113,7 @@ a.project-link:hover { letter-spacing: 0.06em; }
 
 /* ===== 最新投稿大卡 ===== */
 .latest-card {
-  max-width: 860px;
+  max-width: 1000px;
   margin: 0 auto 24px;
   padding: 0;
   overflow: hidden;
@@ -1181,7 +1201,7 @@ a.project-link:hover { letter-spacing: 0.06em; }
 
 /* ===== 全部投稿面板 ===== */
 .works-panel {
-  max-width: 860px;
+  max-width: 1000px;
   margin: 24px auto 0;
   padding: 24px 22px 20px;
 }
@@ -1360,7 +1380,7 @@ a.project-link:hover { letter-spacing: 0.06em; }
 
 /* ===== 关注 CTA ===== */
 .cta-band {
-  max-width: 860px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 34px 32px;
   display: flex;
