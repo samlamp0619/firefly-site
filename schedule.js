@@ -7,7 +7,8 @@
  *   计划日期 > 今天  → 绿色（待发稿）
  * 已发稿的歌在 link 里填 B 站视频地址，详情里会出现直链按钮。
  * 串烧类节目用 medley 列出曲目。
- * 数据来源：26.10发稿计划.xlsx
+ * 数据来源：26.10发稿计划.xlsx + 26.11发稿计划.xlsx
+ * 多个月份共用一套数据，用标题两侧的 ‹ › 切换月份。
  * ============================================================
  */
 (() => {
@@ -23,6 +24,15 @@
     { date: "2026-10-23", song: "2608歌曲投稿串烧（1）", singer: "", submitter: "", link: "",
       medley: ["风之子", "normal no more", "说好的幸福呢"] },
     { date: "2026-10-30", song: "秋凉", singer: "花烬_Phoenix/Kascout/星尘", submitter: "", link: "" },
+
+    /* ---------- 2026.11 ---------- */
+    { date: "2026-11-06", song: "Da Capo", singer: "HOYO-MiX", submitter: "信我包卫萤的", link: "" },
+    { date: "2026-11-08", song: "按下按钮02", singer: "", submitter: "", link: "" },
+    { date: "2026-11-13", song: "我们俩", singer: "郭顶", submitter: "流萤622", link: "" },
+    { date: "2026-11-15", song: "茶汤", singer: "郁可唯", submitter: "唱山歌的昔米露", link: "" },
+    { date: "2026-11-20", song: "你/我 于万千星辰", singer: "3xg233/洛天依", submitter: "", link: "" },
+    { date: "2026-11-27", song: "2608歌曲投稿串烧（2）", singer: "", submitter: "", link: "",
+      medley: ["烂关系", "你是我爱这世界的原因", "真命天女"] },
   ];
 
   const WEEK = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
@@ -86,6 +96,10 @@
     if (!grid) return;
 
     if (title) title.textContent = view.year + " 年 " + (view.month + 1) + " 月";
+
+    /* 板块大标题跟着当前月份走，切到 11 月就显示「2026.11 发稿计划」 */
+    const secTitle = document.getElementById("schedule-title");
+    if (secTitle) secTitle.textContent = view.year + "." + pad(view.month + 1) + " 发稿计划";
 
     const firstWeekday = new Date(view.year, view.month, 1).getDay();          // 0 = 周日
     const daysInMonth = new Date(view.year, view.month + 1, 0).getDate();
