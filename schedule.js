@@ -134,6 +134,7 @@
     { date: "2026-10-30", song: "秋凉", singer: "花烬_Phoenix/Kascout/星尘", submitter: "", link: "" },
 
     /* ---------- 2026.11 ---------- */
+    { date: "2026-11-01", song: "我乘着风飞过来", singer: "洪辰/宁桓宇", submitter: "", link: "" },
     { date: "2026-11-06", song: "Da Capo", singer: "HOYO-MiX", submitter: "信我包卫萤的", link: "" },
     { date: "2026-11-08", song: "按下按钮02", singer: "", submitter: "", link: "" },
     { date: "2026-11-13", song: "我们俩", singer: "郭顶", submitter: "流萤622", link: "" },
