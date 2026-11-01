@@ -103,6 +103,7 @@ export async function onRequestGet(context) {
     uid: payload.uid,
     sid: payload.sid,
     username: payload.name,
+    qq: payload.qq || "",
   });
 }
 

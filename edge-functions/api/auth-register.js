@@ -139,16 +139,17 @@ export async function onRequestPost(context) {
   const { username, qq, password } = v;
   const nameKey = await sha256Hex(username.toLowerCase());
 
-  /* --- 1. 快速查表：已经存在就直接拒，省掉后面一整套流程 --- */
-  const [nameHit, qqHit] = await Promise.all([
+  /* --- 1. 快速查表：已经存在就直接拒，省掉后面一整套流程。
+         三个读并行，因为每次 Blob 读要 300ms 上下，串起来白等。 --- */
+  const [nameHit, qqHit, counter] = await Promise.all([
     store.get("idx/name-" + nameKey + ".json", { type: "json", consistency: "strong" }),
     store.get("idx/qq-" + qq + ".json", { type: "json", consistency: "strong" }),
+    store.get("meta/counter.json", { type: "json", consistency: "strong" }),
   ]);
   if (nameHit) return json({ ok: false, error: "这个用户名已经有人用了" }, 409);
   if (qqHit) return json({ ok: false, error: "这个 QQ 号已经注册过了" }, 409);
 
   const regId = crypto.randomUUID().replace(/-/g, "");
-  const counter = await store.get("meta/counter.json", { type: "json", consistency: "strong" });
   const baseSid = (counter && Number(counter.lastSid)) || 0;
   const tryNo = baseSid + 1;
 
@@ -191,32 +192,31 @@ export async function onRequestPost(context) {
   if (rank < 1) return bail("发号失败，请重试", 500);
   const sid = String(tryNo + rank - 1).padStart(5, "0");
 
-  /* --- 5. 写快速查表 + 账号本体 --- */
+  /* --- 5. 写快速查表 + 账号本体 + 号段提示，四件事一起发，省掉两次串行等待 --- */
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const hash = await hashPassword(password, salt, PBKDF2_ITER);
   const now = new Date().toISOString();
-
-  await Promise.all([
-    store.setJSON("idx/name-" + nameKey + ".json", { regId, sid }),
-    store.setJSON("idx/qq-" + qq + ".json", { regId, sid }),
-  ]);
 
   const user = {
     regId, username, qq, sid,
     salt: b64url(salt), iter: PBKDF2_ITER, hash,
     createdAt: now,
   };
-  await store.setJSON("users/" + regId + ".json", user);
 
+  const writes = [
+    store.setJSON("idx/name-" + nameKey + ".json", { regId, sid }),
+    store.setJSON("idx/qq-" + qq + ".json", { regId, sid }),
+    store.setJSON("users/" + regId + ".json", user),
+  ];
   /* 号段提示往上推；落后了也不要紧，claims 才是真源 */
-  const newLast = Number(sid);
-  if (newLast > baseSid) {
-    await store.setJSON("meta/counter.json", { lastSid: newLast, updatedAt: now });
+  if (Number(sid) > baseSid) {
+    writes.push(store.setJSON("meta/counter.json", { lastSid: Number(sid), updatedAt: now }));
   }
+  await Promise.all(writes);
 
   /* --- 6. 直接发登录态，不用再登一次 --- */
   const token = await signSession(store, {
-    uid: regId, sid, name: username, exp: Date.now() + SESSION_DAYS * 24 * 3600 * 1000,
+    uid: regId, sid, name: username, qq, exp: Date.now() + SESSION_DAYS * 24 * 3600 * 1000,
   });
 
   return json({ ok: true, sid, username, qq }, 200, { "Set-Cookie": sessionCookie(token) });

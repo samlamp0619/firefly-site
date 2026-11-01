@@ -134,7 +134,7 @@ export async function onRequestPost(context) {
   if (failRec) await store.delete(failKey).catch(() => {});
 
   const token = await signSession(store, {
-    uid: user.regId, sid: user.sid, name: user.username,
+    uid: user.regId, sid: user.sid, name: user.username, qq: user.qq,
     exp: Date.now() + SESSION_DAYS * 24 * 3600 * 1000,
   });
 
