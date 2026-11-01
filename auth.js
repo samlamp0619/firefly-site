@@ -79,9 +79,11 @@
     });
     const isReg = next === "register";
     el.qqField.hidden = !isReg;
-    el.accountLabel.textContent = isReg ? "用户名" : "用户名或 QQ 号";
+    /* 登录只要用户名——QQ 号只在注册时填一次，用来保证一号一人。
+       （后端其实也认 QQ 号，留着当兜底，界面不宣传。） */
+    el.accountLabel.textContent = "用户名";
     el.accountInput.autocomplete = isReg ? "nickname" : "username";
-    el.accountInput.placeholder = isReg ? "2~20 个字，之后可以改" : "";
+    el.accountInput.placeholder = isReg ? "2~20 个字" : "注册时填的用户名";
     el.passwordLabel.innerHTML = isReg
       ? '密码<span class="auth-hint">至少 8 位，忘了只能找站主重置</span>'
       : "密码";

@@ -101,11 +101,10 @@ export async function onRequestPost(context) {
     await store.setJSON(failKey, rec).catch(() => {});
   }
 
-  /* --- 查账号：纯数字当 QQ 查，否则当用户名查 --- */
-  const isQQ = /^\d{5,12}$/.test(account);
-  const lookupKey = isQQ
-    ? "idx/qq-" + account + ".json"
-    : "idx/name-" + (await sha256Hex(account.toLowerCase())) + ".json";
+  /* --- 只按用户名查账号。
+         曾经想「纯数字就当成 QQ 号查」，但用户名本身允许是纯数字，
+         会被误判，所以干脆取消 QQ 登录这条路；QQ 只在注册时用一次。 --- */
+  const lookupKey = "idx/name-" + (await sha256Hex(account.toLowerCase())) + ".json";
 
   const idx = await store.get(lookupKey, { type: "json", consistency: "strong" });
   if (!idx || !idx.regId) {
