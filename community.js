@@ -1,17 +1,25 @@
 /* 社区：发帖 / 信息流 / 点赞 / 评论
  * ============================================================
- * 后端：/api/community-posts（GET 信息流 / POST 发帖 / DELETE 删帖）
- *       /api/community-like（POST 点赞切换）
- *       /api/community-comments（GET 列表 / POST 发评论 / DELETE 删评论）
+ * 两种用法，同一份代码：
+ *   · 独立页面 community.html   —— 完整信息流，可发帖、分页、按最新/最热排序
+ *   · 主页 #community 板块      —— 只展示少量「近期热门」，末尾给个入口链接
+ *     容器上写 data-preview="3" 就是预览模式。
  *
- * ⚠️ 所有用户内容一律经过 esc() 再插入 DOM —— 这是 UGC，必须防注入。
+ * 后端：/api/community-posts（GET / POST / DELETE）
+ *       /api/community-like（POST 切换）
+ *       /api/community-comments（GET / POST / DELETE）
+ *
+ * ⚠️ 用户内容一律经过 esc() 再插入 DOM —— 这是 UGC，必须防注入。
  * ============================================================
  */
 (() => {
   "use strict";
 
   const feedEl = document.getElementById("comm-feed");
-  if (!feedEl) return;                       // 这个页面没有社区板块
+  if (!feedEl) return;
+
+  const preview = Number(feedEl.dataset.preview) || 0;   // 0 = 完整模式
+  const isPage = preview === 0;
 
   const el = {
     composer: document.getElementById("comm-composer"),
@@ -21,13 +29,16 @@
     send: document.getElementById("comm-send"),
     hint: document.getElementById("comm-hint"),
     more: document.getElementById("comm-more"),
+    count: document.getElementById("comm-count"),
+    sortBtns: Array.from(document.querySelectorAll(".comm-sort-btn")),
   };
 
   let me = null;
   let cursor = 0;
   let loading = false;
   let posting = false;
-  const openComments = new Set();            // 哪些帖子的评论区是展开的
+  let sort = "new";                       // new | hot
+  const openComments = new Set();
 
   /* ---------- 工具 ---------- */
 
@@ -60,21 +71,23 @@
   }
 
   function setHint(text, kind) {
+    if (!el.hint) return;
     el.hint.textContent = text || "";
     el.hint.className = "comm-hint" + (kind ? " is-" + kind : "");
   }
 
   /* ---------- 渲染 ---------- */
 
-  function postHtml(p) {
+  function postHtml(p, opts) {
+    const compact = !!(opts && opts.compact);
     const open = openComments.has(p.id);
     return '' +
-      '<article class="comm-post" data-id="' + esc(p.id) + '">' +
+      '<article class="comm-post' + (compact ? " is-compact" : "") + '" data-id="' + esc(p.id) + '">' +
         '<header class="comm-head">' +
           '<span class="comm-sid">SID ' + esc(p.sid || "—") + '</span>' +
           '<span class="comm-name">' + esc(p.name || "匿名") + '</span>' +
           '<time class="comm-time">' + esc(timeText(p.ts)) + '</time>' +
-          (p.mine ? '<button type="button" class="comm-del" data-del="post">删除</button>' : '') +
+          (p.mine && !compact ? '<button type="button" class="comm-del" data-del="post">删除</button>' : '') +
         '</header>' +
         '<p class="comm-body">' + esc(p.body) + '</p>' +
         '<footer class="comm-foot">' +
@@ -97,14 +110,18 @@
       '</article>';
   }
 
-  function renderPosts(posts, append) {
-    const html = posts.map(postHtml).join("");
-    if (append) feedEl.insertAdjacentHTML("beforeend", html);
-    else feedEl.innerHTML = html;
-  }
-
   function emptyHtml() {
     return '<p class="comm-empty">还没有人发帖，来当第一个吧～</p>';
+  }
+
+  function previewMoreHtml() {
+    return '<div class="comm-preview-more"><a href="community.html">看看全部发言 →</a></div>';
+  }
+
+  function renderPosts(posts, append) {
+    const html = posts.map(p => postHtml(p)).join("");
+    if (append) feedEl.insertAdjacentHTML("beforeend", html);
+    else feedEl.innerHTML = html;
   }
 
   /* ---------- 信息流 ---------- */
@@ -113,11 +130,32 @@
     if (loading) return;
     loading = true;
     try {
-      const url = "/api/community-posts" + (reset || !cursor ? "" : "?cursor=" + cursor);
-      const data = await api(url);
-      me = data.loggedIn ? (me || { loggedIn: true }) : null;
-      cursor = data.nextCursor || 0;
+      let url;
+      if (preview) {
+        /* 主页预览：拿最近 12 条，再按赞数挑前几条 */
+        url = "/api/community-posts?limit=12";
+      } else if (sort === "hot") {
+        /* 最热：只在最近 30 条里排，不是全站历史，界面上有说明 */
+        url = "/api/community-posts?limit=30";
+      } else {
+        url = "/api/community-posts" + (reset || !cursor ? "" : "?cursor=" + cursor);
+      }
 
+      const data = await api(url);
+      if (data.loggedIn && !me) me = { loggedIn: true };
+
+      if (preview) {
+        const top = data.posts
+          .slice()
+          .sort((a, b) => (b.likeCount - a.likeCount) || (b.ts - a.ts))
+          .slice(0, preview);
+        feedEl.innerHTML = (top.length
+          ? top.map(p => postHtml(p, { compact: true })).join("")
+          : emptyHtml()) + previewMoreHtml();
+        return;
+      }
+
+      cursor = data.nextCursor || 0;
       if (reset) feedEl.innerHTML = "";
       if (data.posts.length) {
         renderPosts(data.posts, !reset);
@@ -126,11 +164,18 @@
         feedEl.innerHTML = emptyHtml();
       }
 
-      el.more.innerHTML = cursor
-        ? '<button type="button" class="comm-more-btn" id="comm-more-btn">加载更多</button>'
-        : "";
-      const moreBtn = document.getElementById("comm-more-btn");
-      if (moreBtn) moreBtn.addEventListener("click", () => loadFeed(false));
+      if (el.count) {
+        const n = feedEl.querySelectorAll(".comm-post").length;
+        el.count.textContent = n ? "本次显示 " + n + " 条" : "";
+      }
+
+      if (el.more) {
+        el.more.innerHTML = (sort === "new" && cursor)
+          ? '<button type="button" class="comm-more-btn" id="comm-more-btn">加载更多</button>'
+          : "";
+        const moreBtn = document.getElementById("comm-more-btn");
+        if (moreBtn) moreBtn.addEventListener("click", () => loadFeed(false));
+      }
     } catch (err) {
       feedEl.innerHTML = '<p class="comm-empty">加载失败：' + esc(err.message) + '</p>';
     } finally {
@@ -174,7 +219,6 @@
     if (!card) return;
     const postId = card.dataset.id;
 
-    /* 点赞 */
     const likeBtn = e.target.closest('[data-act="like"]');
     if (likeBtn) {
       if (!me) return requireLogin();
@@ -195,22 +239,16 @@
       return;
     }
 
-    /* 展开 / 收起评论 */
     const tg = e.target.closest('[data-act="toggle-comments"]');
     if (tg) {
       const box = card.querySelector(".comm-comments");
       const show = box.hidden;
       box.hidden = !show;
-      if (show) {
-        openComments.add(postId);
-        await loadComments(postId);
-      } else {
-        openComments.delete(postId);
-      }
+      if (show) { openComments.add(postId); await loadComments(postId); }
+      else openComments.delete(postId);
       return;
     }
 
-    /* 删除 */
     const del = e.target.closest("[data-del]");
     if (del) {
       const kind = del.dataset.del;
@@ -235,7 +273,6 @@
     }
   });
 
-  /* 发评论 */
   feedEl.addEventListener("submit", async e => {
     const form = e.target.closest("[data-cmt-form]");
     if (!form) return;
@@ -274,55 +311,70 @@
     }
   });
 
-  /* 发帖 */
-  el.send.addEventListener("click", async () => {
-    if (posting) return;
-    if (!me) return requireLogin();
-    const text = el.input.value.trim();
-    if (text.length < 2) return setHint("多写几个字吧", "err");
+  /* 发帖（只有独立页面才有这个框） */
+  if (el.send) {
+    el.send.addEventListener("click", async () => {
+      if (posting) return;
+      if (!me) return requireLogin();
+      const text = el.input.value.trim();
+      if (text.length < 2) return setHint("多写几个字吧", "err");
 
-    posting = true;
-    el.send.disabled = true;
-    el.send.textContent = "发布中…";
-    setHint("");
-    try {
-      const r = await api("/api/community-posts", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: text }),
-      });
-      el.input.value = "";
-      const empty = feedEl.querySelector(".comm-empty");
-      if (empty) empty.remove();
-      feedEl.insertAdjacentHTML("afterbegin", postHtml(r.post));
-      setHint("发布成功", "ok");
-    } catch (err) {
-      setHint(err.message, "err");
-    } finally {
-      posting = false;
-      el.send.disabled = false;
-      el.send.textContent = "发布";
-    }
+      posting = true;
+      el.send.disabled = true;
+      el.send.textContent = "发布中…";
+      setHint("");
+      try {
+        await api("/api/community-posts", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ body: text }),
+        });
+        el.input.value = "";
+        sort = "new";
+        el.sortBtns.forEach(b => b.classList.toggle("is-active", b.dataset.sort === "new"));
+        loadFeed(true);
+        setHint("发布成功", "ok");
+      } catch (err) {
+        setHint(err.message, "err");
+      } finally {
+        posting = false;
+        el.send.disabled = false;
+        el.send.textContent = "发布";
+      }
+    });
+  }
+
+  /* 排序切换 */
+  el.sortBtns.forEach(b => {
+    b.addEventListener("click", () => {
+      if (b.dataset.sort === sort) return;
+      sort = b.dataset.sort;
+      el.sortBtns.forEach(x => x.classList.toggle("is-active", x === b));
+      cursor = 0;
+      loadFeed(true);
+    });
   });
 
   /* ---------- 登录状态 ---------- */
 
   function requireLogin() {
-    const navBtn = document.getElementById("sid-badge");
-    if (navBtn) navBtn.click();
+    const badge = document.getElementById("sid-badge");
+    if (badge) badge.click();
     setHint("登录后才能发帖和点赞～", "err");
   }
 
   function applyAuth(loggedIn) {
     me = loggedIn ? (me || { loggedIn: true }) : null;
-    el.composer.hidden = !loggedIn;
-    el.loginTip.hidden = !!loggedIn;
+    if (el.composer) el.composer.hidden = !loggedIn;
+    if (el.loginTip) el.loginTip.hidden = !!loggedIn;
   }
 
-  el.loginLink.addEventListener("click", e => {
-    e.preventDefault();
-    const navBtn = document.getElementById("sid-badge");
-    if (navBtn) navBtn.click();
-  });
+  if (el.loginLink) {
+    el.loginLink.addEventListener("click", e => {
+      e.preventDefault();
+      const badge = document.getElementById("sid-badge");
+      if (badge) badge.click();
+    });
+  }
 
   /* ---------- 启动 ---------- */
 

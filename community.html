@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="萨姆萤光灯的社区：聊聊流萤、聊聊翻唱。" />
+  <meta name="theme-color" content="#0d181c" />
+  <title>社区 · 萨姆萤光灯</title>
+
+  <!-- 和主页同一套深色主题初始化，避免闪白 -->
+  <script>
+    (function () {
+      var dark = true;
+      try {
+        var saved = localStorage.getItem("theme");
+        if (saved) dark = saved === "dark";
+      } catch (e) { /* 无 localStorage 时按默认深色走 */ }
+      document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+      var m = document.querySelector('meta[name="theme-color"]');
+      if (m) m.setAttribute("content", dark ? "#0d181c" : "#fdf2ff");
+    })();
+  </script>
+
+  <link rel="stylesheet" href="assets/fonts/fonts.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="comm-page">
+
+  <div class="comm-bg" aria-hidden="true"></div>
+
+  <!-- 左下角账号入口（未登录显示「登录」，登录后显示 SID） -->
+  <button type="button" class="sid-badge" id="sid-badge" title="登录 / 我的账号">
+    <span class="sid-badge-label" id="sid-badge-label">登录</span>
+    <b class="sid-badge-value" id="sid-badge-value" hidden>00000</b>
+  </button>
+
+  <header class="comm-top">
+    <a class="comm-back" href="index.html">← 返回主页</a>
+    <h1 class="comm-top-title">社区</h1>
+  </header>
+
+  <main class="comm-main">
+    <div class="comm-card glass">
+
+      <!-- 发帖框（登录后才显示） -->
+      <div class="comm-composer" id="comm-composer" hidden>
+        <textarea id="comm-input" maxlength="1000" rows="4"
+          placeholder="说点什么吧～ 聊聊流萤、聊聊翻唱都行（最多 1000 字）"></textarea>
+        <div class="comm-composer-bar">
+          <span class="comm-hint" id="comm-hint" role="status"></span>
+          <button type="button" class="btn btn-primary comm-send" id="comm-send">发布</button>
+        </div>
+      </div>
+
+      <!-- 没登录时的提示 -->
+      <p class="comm-login-tip" id="comm-login-tip">
+        <a href="#" id="comm-login-link">登录</a> 之后就能发帖、点赞和评论啦～
+      </p>
+
+      <!-- 排序 -->
+      <div class="comm-toolbar">
+        <span class="comm-count" id="comm-count"></span>
+        <div class="comm-sort">
+          <button type="button" class="comm-sort-btn is-active" data-sort="new">最新</button>
+          <button type="button" class="comm-sort-btn" data-sort="hot">最热</button>
+        </div>
+      </div>
+
+      <!-- 信息流 -->
+      <div class="comm-feed" id="comm-feed"></div>
+      <div class="comm-more" id="comm-more"></div>
+    </div>
+  </main>
+
+  <!-- 账号弹窗（和主页同一份逻辑，auth.js 需要这些节点） -->
+  <div class="auth-overlay" id="auth-overlay" hidden>
+    <div class="auth-modal glass" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+      <button type="button" class="auth-close" id="auth-close" aria-label="关闭">✕</button>
+      <h2 class="auth-modal-title" id="auth-modal-title">登录</h2>
+
+      <div class="auth-account" id="auth-account-view" hidden>
+        <dl class="auth-facts">
+          <div><dt>用户名</dt><dd id="auth-my-name">—</dd></div>
+          <div><dt>SID</dt><dd class="auth-my-sid" id="auth-my-sid">—</dd></div>
+          <div><dt>QQ 号</dt><dd id="auth-my-qq">—</dd></div>
+        </dl>
+        <p class="auth-note">按注册先后发的号，注册后不会再变。</p>
+        <button type="button" class="btn btn-ghost auth-submit" id="auth-logout">退出登录</button>
+      </div>
+
+      <div class="auth-forms" id="auth-forms">
+        <div class="auth-tabs" role="tablist">
+          <button type="button" class="auth-tab is-active" data-mode="login" role="tab" aria-selected="true">登录</button>
+          <button type="button" class="auth-tab" data-mode="register" role="tab" aria-selected="false">注册</button>
+        </div>
+
+        <form class="auth-form" id="auth-form" novalidate>
+          <label class="auth-field">
+            <span class="auth-label" id="auth-account-label">用户名</span>
+            <input type="text" id="auth-account" autocomplete="username" maxlength="40" placeholder="注册时填的用户名" />
+          </label>
+
+          <label class="auth-field" id="auth-qq-field" hidden>
+            <span class="auth-label">QQ 号<span class="auth-hint">用于保证一个 QQ 只能注册一个号</span></span>
+            <input type="text" id="auth-qq" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="5~12 位数字" />
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-label" id="auth-password-label">密码</span>
+            <input type="password" id="auth-password" autocomplete="current-password" maxlength="72" />
+          </label>
+
+          <p class="auth-msg" id="auth-msg" role="status"></p>
+          <button type="submit" class="btn btn-primary auth-submit" id="auth-submit">登录账号</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script defer src="community.js"></script>
+  <script defer src="auth.js"></script>
+</body>
+</html>

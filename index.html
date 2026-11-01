@@ -77,7 +77,7 @@
       <div class="visit-counter" id="visit-counter" title="本站访客统计（Vercount）">
         <span class="vc-line" id="vc-line">
           <span class="vc-icon">✨</span>
-          <span class="vc-you">你是本站第</span><b id="vercount_value_site_uv">···</b><span class="vc-you">位访客</span>
+          <span class="vc-you">你是本站第</span><b id="vercount_value_site_uv">181</b><span class="vc-you">位访客</span>
           <span class="vc-sep">·</span>
           <span class="vc-total">总访问量</span><b class="vc-pv" id="vercount_value_site_pv">···</b><span class="vc-total">次</span>
         </span>
@@ -94,7 +94,7 @@
         <li><a href="#schedule">排期</a></li>
         <li><a href="#resources">资源</a></li>
         <li><a href="#projects">作品</a></li>
-        <li><a href="#community">社区</a></li>
+        <li><a href="community.html">社区</a></li>
         <li><a href="#contact">联系我</a></li>
         <li><a href="#survey">问卷</a></li>
       </ul>
@@ -286,30 +286,14 @@
       </div>
     </section>
 
-    <!-- ============ 社区 ============ -->
+    <!-- ============ 社区（主页只放预览，完整内容在 community.html） ============ -->
     <section id="community" class="section">
       <div class="container">
         <h2 class="section-title reveal">社区 <span class="deco">✦</span></h2>
 
         <div class="comm-card glass reveal">
-          <!-- 发帖框（登录后才显示） -->
-          <div class="comm-composer" id="comm-composer" hidden>
-            <textarea id="comm-input" maxlength="1000" rows="3"
-              placeholder="说点什么吧～ 聊聊流萤、聊聊翻唱都行（最多 1000 字）"></textarea>
-            <div class="comm-composer-bar">
-              <span class="comm-hint" id="comm-hint" role="status"></span>
-              <button type="button" class="btn btn-primary comm-send" id="comm-send">发布</button>
-            </div>
-          </div>
-
-          <!-- 没登录时的提示 -->
-          <p class="comm-login-tip" id="comm-login-tip">
-            <a href="#" id="comm-login-link">登录</a> 之后就能发帖、点赞和评论啦～
-          </p>
-
-          <!-- 信息流 -->
-          <div class="comm-feed" id="comm-feed"></div>
-          <div class="comm-more" id="comm-more"></div>
+          <p class="comm-preview-tip">近期大家聊得最多的几条～</p>
+          <div class="comm-feed" id="comm-feed" data-preview="3"></div>
         </div>
       </div>
     </section>

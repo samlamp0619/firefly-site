@@ -1,5 +1,5 @@
 @echo off
 chcp 65001 >nul
-cd /d "%~dp0"
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0????.ps1"
+title Sam Lamp - Account Manager
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0manage-accounts.ps1"
 pause
