@@ -2002,6 +2002,7 @@ body.auth-open { overflow: hidden; }
 
 .auth-msg.is-err { color: #e2565a; }
 .auth-msg.is-ok { color: var(--purple); }
+.auth-msg.is-wait { color: var(--ink-soft); }
 
 .auth-submit {
   width: 100%;

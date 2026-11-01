@@ -21,7 +21,7 @@
     close: document.getElementById("auth-close"),
     title: document.getElementById("auth-modal-title"),
     forms: document.getElementById("auth-forms"),
-    account: document.getElementById("auth-account"),
+    account: document.getElementById("auth-account-view"),
     form: document.getElementById("auth-form"),
     tabs: Array.from(document.querySelectorAll(".auth-tab")),
     accountLabel: document.getElementById("auth-account-label"),
@@ -62,10 +62,16 @@
     return data;
   }
 
+  /* tab 上写「登录 / 注册」，提交按钮写「登录账号 / 注册账号」——
+     两处原本都叫「注册」，点上面那个 tab 会毫无反应，很容易误以为按钮坏了 */
+  function submitLabel() {
+    return mode === "login" ? "登录账号" : "注册账号";
+  }
+
   function setBusy(on, text) {
     busy = on;
     el.submit.disabled = on;
-    el.submit.textContent = on ? (text || "处理中…") : (mode === "login" ? "登录" : "注册");
+    el.submit.textContent = on ? (text || "处理中…") : submitLabel();
   }
 
   /* ---------- 界面状态 ---------- */
@@ -88,7 +94,7 @@
       ? '密码<span class="auth-hint">至少 8 位，忘了只能找站主重置</span>'
       : "密码";
     el.passwordInput.autocomplete = isReg ? "new-password" : "current-password";
-    el.submit.textContent = isReg ? "注册" : "登录";
+    el.submit.textContent = submitLabel();
     setMsg("");
   }
 
@@ -158,25 +164,30 @@
     e.preventDefault();
     if (busy) return;
 
-    const account = el.accountInput.value.trim();
-    const password = el.passwordInput.value;
-
-    if (!account) return setMsg(mode === "register" ? "用户名要填" : "账号要填", "err");
-    if (!password) return setMsg("密码要填", "err");
-
-    let body;
-    if (mode === "register") {
-      const qq = el.qqInput.value.trim();
-      if (!/^\d{5,12}$/.test(qq)) return setMsg("QQ 号要是 5~12 位数字", "err");
-      if (password.length < 8) return setMsg("密码至少 8 位", "err");
-      body = { username: account, qq, password };
-    } else {
-      body = { account, password };
-    }
-
-    setBusy(true, mode === "register" ? "注册中…" : "登录中…");
-    setMsg("");
+    /* 整个处理体包在 try 里：早先有个重复 id 的 bug 让 el.accountInput 拿到了
+       一个 div，读 .value 得到 undefined 后抛异常，而当时 try 只包住了请求那一小段，
+       结果就是「点注册毫无反应、连个错误都没有」。现在任何异常都会显示出来。 */
     try {
+      const account = String(el.accountInput.value || "").trim();
+      const password = String(el.passwordInput.value || "");
+
+      if (!account) return setMsg(mode === "register" ? "用户名要填" : "用户名要填", "err");
+      if (!password) return setMsg("密码要填", "err");
+
+      let body;
+      if (mode === "register") {
+        const qq = String(el.qqInput.value || "").trim();
+        if (!/^\d{5,12}$/.test(qq)) return setMsg("QQ 号要是 5~12 位数字", "err");
+        if (password.length < 8) return setMsg("密码至少 8 位", "err");
+        body = { username: account, qq, password };
+      } else {
+        body = { account, password };
+      }
+
+      setBusy(true, mode === "register" ? "注册中…" : "登录中…");
+      /* 注册要 4 秒上下（要读写好几趟存储），先给句话，免得很像卡住 */
+      setMsg(mode === "register" ? "正在注册，大约需要几秒，别关页面…" : "正在登录…", "wait");
+
       const data = await api(mode === "register" ? "/api/auth-register" : "/api/auth-login", body);
       me = { username: data.username, sid: data.sid, qq: data.qq };
       refreshNav();
@@ -184,7 +195,7 @@
       setMsg(mode === "register" ? "注册成功，你的 SID 是 " + data.sid : "登录成功", "ok");
       el.passwordInput.value = "";
     } catch (err) {
-      setMsg(err.message || "出错了", "err");
+      setMsg(err && err.message ? err.message : "出错了，请刷新页面重试", "err");
     } finally {
       setBusy(false);
     }
