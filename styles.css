@@ -1866,6 +1866,50 @@ html[data-theme="dark"] .nav-links a {
   font-variant-numeric: tabular-nums;
 }
 
+/* 左下角的 SID 徽标 */
+.sid-badge {
+  position: fixed;
+  left: 14px;
+  bottom: 12px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 5px 11px 5px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--ink);
+  background: var(--card);
+  border: 1.5px solid var(--card-border);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.sid-badge[hidden] { display: none; }
+
+.sid-badge:hover { transform: translateY(-1px); border-color: var(--purple); }
+
+.sid-badge-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+.sid-badge-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--purple);
+}
+
+@media (max-width: 560px) {
+  .sid-badge { left: 10px; bottom: 10px; font-size: 0.68rem; padding: 4px 9px 4px 8px; }
+}
+
 /* 遮罩 */
 .auth-overlay {
   position: fixed;

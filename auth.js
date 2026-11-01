@@ -18,6 +18,8 @@
   if (!btn || !overlay) return;
 
   const el = {
+    badge: document.getElementById("sid-badge"),
+    badgeValue: document.getElementById("sid-badge-value"),
     close: document.getElementById("auth-close"),
     title: document.getElementById("auth-modal-title"),
     forms: document.getElementById("auth-forms"),
@@ -129,21 +131,33 @@
     setMsg("");
   }
 
+  /* 顶部按钮只放短文字：写「SID 00001」会比其他导航项宽一截，把整行挤乱。
+     SID 放在左下角的徽标里。 */
   function refreshNav() {
     if (me && me.sid) {
-      btn.textContent = "SID " + me.sid;
+      btn.textContent = "我的";
       btn.classList.add("is-signed-in");
-      btn.title = "已登录：" + (me.username || "");
+      btn.title = "已登录：" + (me.username || "") + "（SID " + me.sid + "）";
     } else {
       btn.textContent = "登录";
       btn.classList.remove("is-signed-in");
       btn.title = "登录或注册";
+    }
+
+    if (el.badge) {
+      if (me && me.sid) {
+        el.badgeValue.textContent = me.sid;
+        el.badge.hidden = false;
+      } else {
+        el.badge.hidden = true;
+      }
     }
   }
 
   /* ---------- 事件 ---------- */
 
   btn.addEventListener("click", open);
+  if (el.badge) el.badge.addEventListener("click", open);
   el.close.addEventListener("click", close);
   overlay.addEventListener("click", e => {
     if (e.target === overlay) close();   // 点遮罩关闭

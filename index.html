@@ -369,6 +369,13 @@
        （优先自建 /api/count，跑在 EdgeOne 边缘；失败自动退回 Vercount）。
        详见 main.js「访客统计」一节。 -->
 
+  <!-- 左下角的 SID 徽标：登录后才出现，点开是账号弹窗。
+       （放这里是因为顶部导航已经很挤，塞个「SID 00001」会把布局挤乱） -->
+  <button type="button" class="sid-badge" id="sid-badge" hidden title="查看我的账号">
+    <span class="sid-badge-label">SID</span>
+    <b class="sid-badge-value" id="sid-badge-value">00000</b>
+  </button>
+
   <!-- ============ 账号弹窗（登录 / 注册 / 我的账号） ============ -->
   <div class="auth-overlay" id="auth-overlay" hidden>
     <div class="auth-modal glass" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
