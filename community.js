@@ -86,6 +86,7 @@
         '<header class="comm-head">' +
           /* 默认只露用户名；点它才去查并展开 SID + QQ */
           '<button type="button" class="comm-name" data-act="who">' + esc(p.name || "匿名") + '</button>' +
+          (p.verified ? '<span class="comm-v" title="已认证">V</span>' : '') +
           '<span class="comm-who" hidden></span>' +
           '<time class="comm-time">' + esc(timeText(p.ts)) + '</time>' +
           (p.mine && !compact ? '<button type="button" class="comm-del" data-del="post">删除</button>' : '') +
@@ -204,6 +205,7 @@
             '<button type="button" class="comm-cmt-name" data-act="who" data-cid="' + esc(c.id) + '">' +
               esc(c.name || "匿名") +
             '</button>' +
+            (c.verified ? '<span class="comm-v" title="已认证">V</span>' : '') +
             '<span class="comm-who" hidden></span>' +
             '<time>' + esc(timeText(c.ts)) + '</time>' +
             (c.mine ? '<button type="button" class="comm-del" data-del="comment" data-cid="' + esc(c.id) + '">删除</button>' : '') +
@@ -253,9 +255,10 @@
       return;
     }
 
-    /* 点用户名：展开 / 收起这个人的 SID 和 QQ 号 */
+    /* 点用户名：展开 / 收起这个人的 SID 和 QQ 号（只对登录用户开放） */
     const who = e.target.closest('[data-act="who"]');
     if (who) {
+      if (!me) return requireLogin();
       const head = who.parentElement;
       const info = head.querySelector(".comm-who");
       if (!info) return;
@@ -330,6 +333,7 @@
             '<button type="button" class="comm-cmt-name" data-act="who" data-cid="' + esc(c.id) + '">' +
               esc(c.name || "匿名") +
             '</button>' +
+            (c.verified ? '<span class="comm-v" title="已认证">V</span>' : '') +
             '<span class="comm-who" hidden></span>' +
             '<time>刚刚</time>' +
             '<button type="button" class="comm-del" data-del="comment" data-cid="' + esc(c.id) + '">删除</button>' +

@@ -90,6 +90,7 @@ export async function onRequestGet(context) {
       username: (u && u.username) || "（记录缺失）",
       qq: (u && u.qq) || "",
       createdAt: (u && u.createdAt) || "",
+      verified: !!(u && u.verified),
       ok: !!u,
     };
   }));
@@ -116,6 +117,15 @@ export async function onRequestPost(context) {
   if (!/^[a-f0-9]{32}$/.test(regId)) return json({ ok: false, error: "regId 不对" }, 400);
 
   const user = await store.get("users/" + regId + ".json", { type: "json", consistency: "strong" });
+
+  /* ---------- 黄V（认证） ---------- */
+  if (action === "set-verified") {
+    if (!user) return json({ ok: false, error: "账号不存在" }, 404);
+    const v = body.verified === true;
+    const next = Object.assign({}, user, { verified: v, verifiedAt: v ? new Date().toISOString() : "" });
+    await store.setJSON("users/" + regId + ".json", next);
+    return json({ ok: true, sid: user.sid, username: user.username, verified: v });
+  }
 
   /* ---------- 重置密码 ---------- */
   if (action === "reset-password") {

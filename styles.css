@@ -2503,3 +2503,21 @@ html[data-theme="dark"] .comm-bg {
 }
 
 .comm-who[hidden] { display: none; }
+
+/* 黄V 认证徽标 */
+.comm-v {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  font-size: 0.6rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #3d2c00;
+  background: linear-gradient(145deg, #ffd54a, #f5b301);
+  box-shadow: 0 1px 4px rgba(245, 179, 1, 0.45);
+  vertical-align: 1px;
+  flex: none;
+}

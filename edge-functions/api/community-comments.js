@@ -96,6 +96,20 @@ function newId() {
   return crypto.randomUUID().replace(/-/g, "").slice(0, 12);
 }
 
+/* 黄V（认证）状态：同一页里同一个作者只查一次 */
+const VERIFIED_CACHE = new Map();
+async function isVerified(regId) {
+  if (!regId) return false;
+  if (VERIFIED_CACHE.has(regId)) return VERIFIED_CACHE.get(regId);
+  let ok = false;
+  try {
+    const u = await getStore(AUTH_STORE).get("users/" + regId + ".json", { type: "json", consistency: "strong" });
+    ok = !!(u && u.verified);
+  } catch { ok = false; }
+  VERIFIED_CACHE.set(regId, ok);
+  return ok;
+}
+
 /* 找到帖子本体（信息流里的键是 posts/<ts>-<id>.json） */
 async function findPostKey(store, postId) {
   const r = await store.list({ prefix: "posts/", consistency: "strong" });
@@ -116,6 +130,7 @@ async function listComments(context, store) {
     return {
       id: c.id, ts: c.ts, name: c.name, sid: c.sid, body: c.body,
       mine: !!(me && me.uid === c.regId),
+      verified: await isVerified(c.regId),
     };
   }));
   return json({ ok: true, loggedIn: !!me, comments: items.filter(Boolean) });

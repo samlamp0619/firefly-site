@@ -48,14 +48,15 @@ function Show-List {
     Write-Host ""
     Write-Host ("  共 " + $r.count + " 个账号" + $(if ($r.truncated) { "（只显示前 " + $r.shown + " 个）" } else { "" })) -ForegroundColor Cyan
     Write-Host ""
-    Write-Host ("  {0,-7} {1,-16} {2,-14} {3}" -f "SID", "用户名", "QQ 号", "注册时间")
-    Write-Host ("  " + ("-" * 60))
+    Write-Host ("  {0,-7} {1,-16} {2,-14} {3,-6} {4}" -f "SID", "用户名", "QQ 号", "认证", "注册时间")
+    Write-Host ("  " + ("-" * 68))
     foreach ($u in $r.users) {
         $when = ""
         if ($u.createdAt) {
             try { $when = ([datetime]::Parse($u.createdAt)).ToLocalTime().ToString("yyyy-MM-dd HH:mm") } catch { $when = $u.createdAt }
         }
-        Write-Host ("  {0,-7} {1,-16} {2,-14} {3}" -f $u.sid, $u.username, $u.qq, $when)
+        $v = if ($u.verified) { "黄V" } else { "-" }
+        Write-Host ("  {0,-7} {1,-16} {2,-14} {3,-6} {4}" -f $u.sid, $u.username, $u.qq, $v, $when) -ForegroundColor $(if ($u.verified) { "Yellow" } else { "Gray" })
     }
     Write-Host ""
 }
@@ -114,6 +115,43 @@ function Recalc-Counter {
     }
 }
 
+# ---------------- 黄V（认证） ----------------
+# 认证用户会在社区的帖子和评论旁边多一个黄色 V 徽标。
+
+function Toggle-Verified {
+    try { $r = Call-Api "GET" $null } catch {
+        Write-Host "  拉取失败：$($_.Exception.Message)" -ForegroundColor Red
+        return
+    }
+    if ($r.count -eq 0) { Write-Host "  还没有账号。" -ForegroundColor Yellow; return }
+    Show-List
+
+    $name = Read-Host "  输入用户名（或 SID），直接回车取消"
+    if (-not $name) { return }
+    $name = $name.Trim()
+    $hit = $r.users | Where-Object { $_.username -eq $name -or $_.sid -eq $name }
+    if (-not $hit) { Write-Host "  没找到这个账号。" -ForegroundColor Red; return }
+    if ($hit -is [array]) { Write-Host "  匹配到多个，请用 SID 再试一次。" -ForegroundColor Red; return }
+
+    $cur = if ($hit.verified) { "已有黄V" } else { "还没有黄V" }
+    Write-Host ("  目标：" + $hit.sid + "  " + $hit.username + "（" + $cur + "）") -ForegroundColor Cyan
+    $ans = Read-Host "  输入 y 加黄V / 输入 n 取消黄V / 其他键放弃"
+    $want = $null
+    if ($ans -eq "y") { $want = $true }
+    elseif ($ans -eq "n") { $want = $false }
+    else { Write-Host "  已取消。"; return }
+
+    try {
+        $res = Call-Api "POST" @{ action = "set-verified"; regId = $hit.regId; verified = $want }
+        if ($want) {
+            Write-Host ("  ✓ 已给 " + $hit.username + " 加上黄V") -ForegroundColor Green
+        } else {
+            Write-Host ("  ✓ 已取消 " + $hit.username + " 的黄V") -ForegroundColor Green
+        }
+    } catch {
+        Write-Host ("  失败：" + $_.Exception.Message) -ForegroundColor Red
+    }
+}
 # ---------------- 社区审核 ----------------
 # 先发后审就靠这几项：能看最近发言、能删任意帖子和评论。
 
@@ -232,6 +270,7 @@ while ($true) {
     Write-Host "  2  重置某人的密码"
     Write-Host "  3  删除账号"
     Write-Host "  4  重算号段提示"
+    Write-Host "  8  加 / 取消黄V"
     Write-Host ""
     Write-Host "  --- 社区审核 ---" -ForegroundColor DarkGray
     Write-Host "  5  查看最近发言"
@@ -247,6 +286,7 @@ while ($true) {
         "2" { Reset-Password }
         "3" { Remove-Account }
         "4" { Recalc-Counter }
+        "8" { Toggle-Verified }
         "5" { Show-Posts }
         "6" { Remove-Post }
         "7" { Manage-Comments }

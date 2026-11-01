@@ -106,6 +106,20 @@ function newId() {
   return crypto.randomUUID().replace(/-/g, "").slice(0, 16);
 }
 
+/* 黄V（认证）状态：同一个作者在一页里只查一次 */
+const VERIFIED_CACHE = new Map();
+async function isVerified(regId) {
+  if (!regId) return false;
+  if (VERIFIED_CACHE.has(regId)) return VERIFIED_CACHE.get(regId);
+  let ok = false;
+  try {
+    const u = await getStore(AUTH_STORE).get("users/" + regId + ".json", { type: "json", consistency: "strong" });
+    ok = !!(u && u.verified);
+  } catch { ok = false; }
+  VERIFIED_CACHE.set(regId, ok);
+  return ok;
+}
+
 /* ---------- 信息流 ---------- */
 async function feed(context, store) {
   const url = new URL(context.request.url);
@@ -145,13 +159,15 @@ async function feed(context, store) {
       commentCount: Number(p.commentCount) || 0,
       liked,
       mine: !!(me && me.uid === p.regId),
+      verified: await isVerified(p.regId),
+      regId: p.regId,
     };
   }));
 
   return json({
     ok: true,
     loggedIn: !!me,
-    posts: posts.filter(Boolean),
+    posts: posts.filter(Boolean).map(({ regId, ...rest }) => rest),   // regId 不外传
     nextCursor: page.length === limit ? Number(page[page.length - 1].slice(6).split("-")[0]) : 0,
   });
 }
