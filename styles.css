@@ -2465,3 +2465,41 @@ html[data-theme="dark"] .comm-bg {
 @media (max-width: 600px) {
   .comm-page .comm-card { padding: 18px 14px 16px; }
 }
+
+/* --- 社区：用户名可点，点了展开 SID + QQ --- */
+.comm-name,
+.comm-cmt-name {
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-bottom: 1px dashed transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.comm-cmt-name { font-size: 0.76rem; }
+
+.comm-name:hover,
+.comm-cmt-name:hover {
+  color: var(--purple);
+  border-bottom-color: var(--purple);
+}
+
+.comm-name:disabled,
+.comm-cmt-name:disabled { opacity: 0.6; cursor: default; }
+
+.comm-who {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: var(--ink-soft);
+  background: rgba(127, 127, 127, 0.14);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.comm-who[hidden] { display: none; }

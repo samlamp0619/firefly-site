@@ -84,8 +84,9 @@
     return '' +
       '<article class="comm-post' + (compact ? " is-compact" : "") + '" data-id="' + esc(p.id) + '">' +
         '<header class="comm-head">' +
-          '<span class="comm-sid">SID ' + esc(p.sid || "—") + '</span>' +
-          '<span class="comm-name">' + esc(p.name || "匿名") + '</span>' +
+          /* 默认只露用户名；点它才去查并展开 SID + QQ */
+          '<button type="button" class="comm-name" data-act="who">' + esc(p.name || "匿名") + '</button>' +
+          '<span class="comm-who" hidden></span>' +
           '<time class="comm-time">' + esc(timeText(p.ts)) + '</time>' +
           (p.mine && !compact ? '<button type="button" class="comm-del" data-del="post">删除</button>' : '') +
         '</header>' +
@@ -200,7 +201,10 @@
       box.innerHTML = data.comments.map(c => '' +
         '<div class="comm-cmt">' +
           '<span class="comm-cmt-head">' +
-            '<b>SID ' + esc(c.sid || "—") + '</b> ' + esc(c.name || "匿名") +
+            '<button type="button" class="comm-cmt-name" data-act="who" data-cid="' + esc(c.id) + '">' +
+              esc(c.name || "匿名") +
+            '</button>' +
+            '<span class="comm-who" hidden></span>' +
             '<time>' + esc(timeText(c.ts)) + '</time>' +
             (c.mine ? '<button type="button" class="comm-del" data-del="comment" data-cid="' + esc(c.id) + '">删除</button>' : '') +
           '</span>' +
@@ -246,6 +250,33 @@
       box.hidden = !show;
       if (show) { openComments.add(postId); await loadComments(postId); }
       else openComments.delete(postId);
+      return;
+    }
+
+    /* 点用户名：展开 / 收起这个人的 SID 和 QQ 号 */
+    const who = e.target.closest('[data-act="who"]');
+    if (who) {
+      const head = who.parentElement;
+      const info = head.querySelector(".comm-who");
+      if (!info) return;
+      if (!info.hidden) { info.hidden = true; return; }
+      if (info.dataset.loaded) { info.hidden = false; return; }
+
+      who.disabled = true;
+      info.textContent = "查询中…";
+      info.hidden = false;
+      try {
+        const cid = who.dataset.cid;
+        const url = "/api/community-user?postId=" + encodeURIComponent(postId) +
+          (cid ? "&commentId=" + encodeURIComponent(cid) : "");
+        const d = await api(url);
+        info.textContent = "SID " + (d.sid || "—") + " · QQ " + (d.qq || "—");
+        info.dataset.loaded = "1";
+      } catch (err) {
+        info.textContent = err.message || "查不到";
+      } finally {
+        who.disabled = false;
+      }
       return;
     }
 
@@ -296,7 +327,10 @@
       box.insertAdjacentHTML("beforeend", '' +
         '<div class="comm-cmt">' +
           '<span class="comm-cmt-head">' +
-            '<b>SID ' + esc(c.sid || "—") + '</b> ' + esc(c.name || "匿名") +
+            '<button type="button" class="comm-cmt-name" data-act="who" data-cid="' + esc(c.id) + '">' +
+              esc(c.name || "匿名") +
+            '</button>' +
+            '<span class="comm-who" hidden></span>' +
             '<time>刚刚</time>' +
             '<button type="button" class="comm-del" data-del="comment" data-cid="' + esc(c.id) + '">删除</button>' +
           '</span>' +

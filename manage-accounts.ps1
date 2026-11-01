@@ -114,6 +114,114 @@ function Recalc-Counter {
     }
 }
 
+# ---------------- 社区审核 ----------------
+# 先发后审就靠这几项：能看最近发言、能删任意帖子和评论。
+
+function Get-Posts([int]$Limit = 20) {
+    $url = "$Site/api/community-posts?limit=$Limit"
+    return Invoke-RestMethod -Uri $url -Method Get -TimeoutSec 60
+}
+
+function Show-Posts {
+    Write-Host ""
+    Write-Host "读取最近发言…" -ForegroundColor DarkGray
+    try { $r = Get-Posts 20 } catch {
+        Write-Host "拉取失败：$($_.Exception.Message)" -ForegroundColor Red
+        return
+    }
+    if (-not $r.posts -or $r.posts.Count -eq 0) {
+        Write-Host ""
+        Write-Host "  社区里还没有发言。" -ForegroundColor Yellow
+        Write-Host ""
+        return
+    }
+    Write-Host ""
+    Write-Host ("  最近 " + $r.posts.Count + " 条发言") -ForegroundColor Cyan
+    Write-Host ""
+    $i = 0
+    foreach ($p in $r.posts) {
+        $i++
+        $when = try { ([datetime]::Parse("1970-01-01T00:00:00Z").AddMilliseconds($p.ts)).ToLocalTime().ToString("MM-dd HH:mm") } catch { "" }
+        $text = $p.body -replace "\s+", " "
+        if ($text.Length -gt 42) { $text = $text.Substring(0, 42) + "…" }
+        Write-Host ("  [" + $i + "] " + $p.name + "（SID " + $p.sid + "） " + $when + "  ♥" + $p.likeCount + "  💬" + $p.commentCount)
+        Write-Host ("      " + $text) -ForegroundColor DarkGray
+    }
+    Write-Host ""
+    Write-Host "  删帖用菜单 6。" -ForegroundColor DarkGray
+    Write-Host ""
+}
+
+function Remove-Post {
+    try { $r = Get-Posts 20 } catch {
+        Write-Host "  拉取失败：$($_.Exception.Message)" -ForegroundColor Red
+        return
+    }
+    if (-not $r.posts -or $r.posts.Count -eq 0) { Write-Host "  没有发言可删。" -ForegroundColor Yellow; return }
+    Show-Posts
+    $n = Read-Host "  输入要删除的编号（直接回车取消）"
+    if (-not $n) { return }
+    $idx = 0
+    if (-not [int]::TryParse($n, [ref]$idx)) { Write-Host "  编号不对。" -ForegroundColor Red; return }
+    if ($idx -lt 1 -or $idx -gt $r.posts.Count) { Write-Host "  没有这个编号。" -ForegroundColor Red; return }
+    $target = $r.posts[$idx - 1]
+    Write-Host ("  要删除：" + $target.name + "（SID " + $target.sid + "）") -ForegroundColor Yellow
+    Write-Host ("  内容：" + ($target.body -replace "\s+", " ")) -ForegroundColor DarkGray
+    if ((Read-Host "  确认删除？输入 yes 继续") -ne "yes") { Write-Host "  已取消。"; return }
+    try {
+        $api = "$Site/api/community-posts?id=" + $target.id + "&token=$Token"
+        $null = Invoke-RestMethod -Uri $api -Method Delete -TimeoutSec 60
+        Write-Host "  ✓ 已删除这条发言（它的点赞和评论留在库里但不显示了）" -ForegroundColor Green
+    } catch {
+        Write-Host ("  失败：" + $_.Exception.Message) -ForegroundColor Red
+    }
+}
+
+function Manage-Comments {
+    try { $r = Get-Posts 20 } catch {
+        Write-Host "  拉取失败：$($_.Exception.Message)" -ForegroundColor Red
+        return
+    }
+    if (-not $r.posts -or $r.posts.Count -eq 0) { Write-Host "  没有发言。" -ForegroundColor Yellow; return }
+    Show-Posts
+    $n = Read-Host "  输入要查看评论的发言编号（直接回车取消）"
+    if (-not $n) { return }
+    $idx = 0
+    if (-not [int]::TryParse($n, [ref]$idx)) { Write-Host "  编号不对。" -ForegroundColor Red; return }
+    if ($idx -lt 1 -or $idx -gt $r.posts.Count) { Write-Host "  没有这个编号。" -ForegroundColor Red; return }
+    $target = $r.posts[$idx - 1]
+
+    try {
+        $c = Invoke-RestMethod -Uri "$Site/api/community-comments?postId=$($target.id)" -Method Get -TimeoutSec 60
+    } catch {
+        Write-Host ("  拉取评论失败：" + $_.Exception.Message) -ForegroundColor Red
+        return
+    }
+    if (-not $c.comments -or $c.comments.Count -eq 0) { Write-Host "  这篇没有评论。" -ForegroundColor Yellow; return }
+
+    Write-Host ""
+    Write-Host ("  共 " + $c.comments.Count + " 条评论") -ForegroundColor Cyan
+    $i = 0
+    foreach ($cm in $c.comments) {
+        $i++
+        Write-Host ("  [" + $i + "] " + $cm.name + "（SID " + $cm.sid + "）")
+        Write-Host ("      " + $cm.body) -ForegroundColor DarkGray
+    }
+    Write-Host ""
+    $n2 = Read-Host "  输入要删除的评论编号（直接回车取消）"
+    if (-not $n2) { return }
+    $j = 0
+    if (-not [int]::TryParse($n2, [ref]$j)) { Write-Host "  编号不对。" -ForegroundColor Red; return }
+    if ($j -lt 1 -or $j -gt $c.comments.Count) { Write-Host "  没有这个编号。" -ForegroundColor Red; return }
+    $tcm = $c.comments[$j - 1]
+    if ((Read-Host ("  确认删除 " + $tcm.name + " 的这条评论？输入 yes 继续")) -ne "yes") { Write-Host "  已取消。"; return }
+    try {
+        $null = Invoke-RestMethod -Uri "$Site/api/community-comments?postId=$($target.id)&id=$($tcm.id)&token=$Token" -Method Delete -TimeoutSec 60
+        Write-Host "  ✓ 已删除" -ForegroundColor Green
+    } catch {
+        Write-Host ("  失败：" + $_.Exception.Message) -ForegroundColor Red
+    }
+}
 # ---------------- 主循环 ----------------
 while ($true) {
     Write-Host ""
@@ -124,6 +232,12 @@ while ($true) {
     Write-Host "  2  重置某人的密码"
     Write-Host "  3  删除账号"
     Write-Host "  4  重算号段提示"
+    Write-Host ""
+    Write-Host "  --- 社区审核 ---" -ForegroundColor DarkGray
+    Write-Host "  5  查看最近发言"
+    Write-Host "  6  删除某条发言"
+    Write-Host "  7  查看 / 删除某帖的评论"
+    Write-Host ""
     Write-Host "  0  退出"
     Write-Host ""
     $pick = Read-Host "选一个"
@@ -133,6 +247,9 @@ while ($true) {
         "2" { Reset-Password }
         "3" { Remove-Account }
         "4" { Recalc-Counter }
+        "5" { Show-Posts }
+        "6" { Remove-Post }
+        "7" { Manage-Comments }
         "0" { return }
         default { Write-Host "  没有这个选项。" -ForegroundColor DarkGray }
     }
