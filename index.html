@@ -94,9 +94,9 @@
         <li><a href="#schedule">排期</a></li>
         <li><a href="#resources">资源</a></li>
         <li><a href="#projects">作品</a></li>
+        <li><a href="#community">社区</a></li>
         <li><a href="#contact">联系我</a></li>
         <li><a href="#survey">问卷</a></li>
-        <li class="nav-auth"><button type="button" class="nav-auth-btn" id="nav-auth-btn">登录</button></li>
       </ul>
     </nav>
   </header>
@@ -286,6 +286,34 @@
       </div>
     </section>
 
+    <!-- ============ 社区 ============ -->
+    <section id="community" class="section">
+      <div class="container">
+        <h2 class="section-title reveal">社区 <span class="deco">✦</span></h2>
+
+        <div class="comm-card glass reveal">
+          <!-- 发帖框（登录后才显示） -->
+          <div class="comm-composer" id="comm-composer" hidden>
+            <textarea id="comm-input" maxlength="1000" rows="3"
+              placeholder="说点什么吧～ 聊聊流萤、聊聊翻唱都行（最多 1000 字）"></textarea>
+            <div class="comm-composer-bar">
+              <span class="comm-hint" id="comm-hint" role="status"></span>
+              <button type="button" class="btn btn-primary comm-send" id="comm-send">发布</button>
+            </div>
+          </div>
+
+          <!-- 没登录时的提示 -->
+          <p class="comm-login-tip" id="comm-login-tip">
+            <a href="#" id="comm-login-link">登录</a> 之后就能发帖、点赞和评论啦～
+          </p>
+
+          <!-- 信息流 -->
+          <div class="comm-feed" id="comm-feed"></div>
+          <div class="comm-more" id="comm-more"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ 联系方式 ============ -->
     <section id="contact" class="section">
       <div class="container">
@@ -369,11 +397,11 @@
        （优先自建 /api/count，跑在 EdgeOne 边缘；失败自动退回 Vercount）。
        详见 main.js「访客统计」一节。 -->
 
-  <!-- 左下角的 SID 徽标：登录后才出现，点开是账号弹窗。
-       （放这里是因为顶部导航已经很挤，塞个「SID 00001」会把布局挤乱） -->
-  <button type="button" class="sid-badge" id="sid-badge" hidden title="查看我的账号">
-    <span class="sid-badge-label">SID</span>
-    <b class="sid-badge-value" id="sid-badge-value">00000</b>
+  <!-- 左下角的账号徽标：未登录显示「登录」，登录后显示「SID 00001」。
+       放这里是因为顶部导航已经排满 9 项，再塞一个按钮就会换行挤乱。 -->
+  <button type="button" class="sid-badge" id="sid-badge" title="登录 / 我的账号">
+    <span class="sid-badge-label" id="sid-badge-label">登录</span>
+    <b class="sid-badge-value" id="sid-badge-value" hidden>00000</b>
   </button>
 
   <!-- ============ 账号弹窗（登录 / 注册 / 我的账号） ============ -->
@@ -431,6 +459,7 @@
   <script defer src="projects.js"></script>
   <script defer src="schedule.js"></script>
   <script defer src="survey.js"></script>
+  <script defer src="community.js"></script>
   <script defer src="auth.js"></script>
   <script defer src="main.js"></script>
 </body>

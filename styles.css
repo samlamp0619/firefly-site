@@ -2094,3 +2094,246 @@ body.auth-open { overflow: hidden; }
   .nav-auth-btn { font-size: 0.8rem; padding: 5px 11px; }
   .auth-modal { padding: 24px 20px 20px; border-radius: 18px; }
 }
+
+/* ============================================================
+   社区（发帖 / 信息流 / 点赞 / 评论）
+   配色走现有变量，深浅两套主题都自动适配
+   ============================================================ */
+
+.comm-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 26px 28px 24px;
+}
+
+/* 发帖框 */
+.comm-composer[hidden] { display: none; }
+
+.comm-composer textarea {
+  width: 100%;
+  font: inherit;
+  font-size: 0.94rem;
+  line-height: 1.7;
+  padding: 12px 14px;
+  border-radius: 14px;
+  resize: vertical;
+  color: var(--ink);
+  background: rgba(127, 127, 127, 0.14);
+  border: 1.5px solid rgba(127, 127, 127, 0.38);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.comm-composer textarea:focus {
+  outline: none;
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.16);
+}
+
+.comm-composer textarea::placeholder { color: var(--ink-soft); opacity: 0.75; }
+
+.comm-composer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 12px 0 20px;
+}
+
+.comm-hint { font-size: 0.8rem; line-height: 1.5; min-height: 1.2em; }
+.comm-hint.is-ok { color: var(--purple); }
+.comm-hint.is-err { color: #e2565a; }
+
+.comm-send { min-width: 96px; }
+
+/* 未登录提示 */
+.comm-login-tip {
+  margin: 4px 0 20px;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.comm-login-tip[hidden] { display: none; }
+
+.comm-login-tip a { color: var(--purple); font-weight: 700; }
+
+/* 帖子 */
+.comm-feed { display: flex; flex-direction: column; gap: 14px; }
+
+.comm-post {
+  border-radius: 16px;
+  padding: 16px 18px 12px;
+  background: rgba(127, 127, 127, 0.08);
+  border: 1px solid var(--card-border);
+}
+
+.comm-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.comm-sid {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: var(--purple);
+  background: rgba(46, 196, 182, 0.14);
+  font-variant-numeric: tabular-nums;
+}
+
+.comm-name { font-size: 0.88rem; font-weight: 700; color: var(--ink); }
+
+.comm-time { font-size: 0.74rem; color: var(--ink-soft); }
+
+.comm-del {
+  margin-left: auto;
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: #e2565a;
+  background: transparent;
+  border: 1px solid rgba(226, 86, 90, 0.4);
+  transition: background 0.2s;
+}
+
+.comm-del:hover { background: rgba(226, 86, 90, 0.12); }
+
+.comm-body {
+  font-size: 0.94rem;
+  line-height: 1.75;
+  color: var(--ink);
+  white-space: pre-wrap;      /* 用户敲的换行要保留 */
+  word-break: break-word;
+  margin-bottom: 12px;
+}
+
+.comm-foot { display: flex; gap: 8px; }
+
+.comm-btn {
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 1px solid var(--card-border);
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.comm-btn:hover { color: var(--ink); border-color: var(--purple); }
+
+.comm-btn:disabled { opacity: 0.6; cursor: default; }
+
+.comm-like .comm-heart { margin-right: 4px; }
+
+.comm-like.is-on {
+  color: #ff6b81;
+  border-color: rgba(255, 107, 129, 0.5);
+  background: rgba(255, 107, 129, 0.1);
+}
+
+/* 评论区 */
+.comm-comments {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--card-border);
+}
+
+.comm-comments[hidden] { display: none; }
+
+.comm-cmt-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+
+.comm-cmt { display: flex; flex-direction: column; gap: 3px; }
+
+.comm-cmt-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+}
+
+.comm-cmt-head b { color: var(--purple); font-size: 0.68rem; letter-spacing: 0.06em; }
+
+.comm-cmt-head time { font-size: 0.7rem; opacity: 0.8; }
+
+.comm-cmt-head .comm-del { margin-left: auto; font-size: 0.68rem; }
+
+.comm-cmt-body {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.comm-cmt-none, .comm-cmt-loading { font-size: 0.8rem; color: var(--ink-soft); }
+
+.comm-cmt-form { display: flex; gap: 8px; }
+
+.comm-cmt-form input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.86rem;
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: var(--ink);
+  background: rgba(127, 127, 127, 0.12);
+  border: 1.5px solid rgba(127, 127, 127, 0.32);
+}
+
+.comm-cmt-form input:focus {
+  outline: none;
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.14);
+}
+
+.comm-cmt-form input::placeholder { color: var(--ink-soft); opacity: 0.75; }
+
+.comm-cmt-form button {
+  font-size: 0.82rem;
+  padding: 8px 16px;
+  min-width: 0;
+}
+
+/* 空状态 / 加载更多 */
+.comm-empty {
+  padding: 28px 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.comm-more { display: flex; justify-content: center; margin-top: 16px; }
+
+.comm-more-btn {
+  font: inherit;
+  font-size: 0.84rem;
+  padding: 8px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--ink);
+  background: rgba(127, 127, 127, 0.12);
+  border: 1px solid var(--card-border);
+  transition: border-color 0.2s;
+}
+
+.comm-more-btn:hover { border-color: var(--purple); }
+
+@media (max-width: 600px) {
+  .comm-card { padding: 20px 16px 18px; }
+  .comm-post { padding: 14px 14px 10px; }
+  .comm-composer-bar { flex-direction: column; align-items: stretch; }
+  .comm-send { width: 100%; }
+  .comm-cmt-form { flex-direction: column; }
+  .comm-cmt-form button { width: 100%; }
+}

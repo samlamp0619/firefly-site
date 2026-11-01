@@ -13,12 +13,15 @@
 (() => {
   "use strict";
 
-  const btn = document.getElementById("nav-auth-btn");
+  /* 账号入口在左下角的徽标上：未登录显示「登录」，登录后显示「SID 00001」。
+     顶部导航已经排满，塞不下一个按钮。 */
+  const btn = document.getElementById("sid-badge");
   const overlay = document.getElementById("auth-overlay");
   if (!btn || !overlay) return;
 
   const el = {
     badge: document.getElementById("sid-badge"),
+    badgeLabel: document.getElementById("sid-badge-label"),
     badgeValue: document.getElementById("sid-badge-value"),
     close: document.getElementById("auth-close"),
     title: document.getElementById("auth-modal-title"),
@@ -131,26 +134,19 @@
     setMsg("");
   }
 
-  /* 顶部按钮只放短文字：写「SID 00001」会比其他导航项宽一截，把整行挤乱。
-     SID 放在左下角的徽标里。 */
+  /* 左下角徽标：未登录显示「登录」，登录后显示「SID 00001」 */
   function refreshNav() {
     if (me && me.sid) {
-      btn.textContent = "我的";
+      el.badgeLabel.textContent = "SID";
+      el.badgeValue.textContent = me.sid;
+      el.badgeValue.hidden = false;
       btn.classList.add("is-signed-in");
-      btn.title = "已登录：" + (me.username || "") + "（SID " + me.sid + "）";
+      btn.title = "已登录：" + (me.username || "") + "，点开看我的账号";
     } else {
-      btn.textContent = "登录";
+      el.badgeLabel.textContent = "登录";
+      el.badgeValue.hidden = true;
       btn.classList.remove("is-signed-in");
       btn.title = "登录或注册";
-    }
-
-    if (el.badge) {
-      if (me && me.sid) {
-        el.badgeValue.textContent = me.sid;
-        el.badge.hidden = false;
-      } else {
-        el.badge.hidden = true;
-      }
     }
   }
 
