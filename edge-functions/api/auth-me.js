@@ -54,11 +54,12 @@ async function getSecret(store) {
   if (SECRET_CACHE) return SECRET_CACHE;
   const cur = await store.get("meta/secret.json", { type: "json", consistency: "strong" });
   if (cur && cur.secret) { SECRET_CACHE = cur.secret; return SECRET_CACHE; }
-  /* 还没人注册过，也就不会有会话——生成一个空密钥即可，注册时会写入正式密钥 */
-  const fresh = hex(crypto.getRandomValues(new Uint8Array(32)));
-  await store.setJSON("meta/secret.json", { secret: fresh, createdAt: new Date().toISOString() });
-  SECRET_CACHE = fresh;
-  return fresh;
+
+  /* ⚠️ 这里**绝对不能**自己生成新密钥。
+     auth-me 每次页面加载都会被调用，一旦某次读失败就在这里换掉密钥，
+     所有人已有的登录会瞬间全部作废——「登录偶尔失效」就是这么来的。
+     密钥只由 auth-register / auth-login 在首次使用时创建。 */
+  return null;
 }
 
 export async function onRequestGet(context) {
@@ -74,6 +75,7 @@ export async function onRequestGet(context) {
   let checked = false;          // 是否真的完成了一次验签
   try {
     const secret = await getSecret(store);
+    if (!secret) return json({ ok: true, loggedIn: false, transient: true });
     const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["verify"]);
     valid = await crypto.subtle.verify("HMAC", key, b64urlDecode(sig), enc.encode(body));
     checked = true;

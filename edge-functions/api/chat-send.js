@@ -86,8 +86,16 @@ function clean(v, max) {
 }
 
 export async function onRequestPost(context) {
+  /* 区分「没带 Cookie」和「Cookie 无效」，排查时能一眼看出是哪一种 */
+  const hasCookie = !!readCookie(context.request, "dsh_session");
   const me = await session(context.request);
-  if (!me) return json({ ok: false, error: "登录后才能和 bot 聊天" }, 401);
+  if (!me) {
+    return json({
+      ok: false,
+      error: hasCookie ? "登录状态已失效，请退出后重新登录" : "没有收到登录信息，请先登录",
+      code: hasCookie ? "session_invalid" : "session_missing",
+    }, 401);
+  }
 
   let body;
   try { body = await context.request.json(); } catch { return json({ ok: false, error: "请求格式不对" }, 400); }

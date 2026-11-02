@@ -95,7 +95,28 @@ export async function onRequestGet(context) {
     };
   }));
 
-  return json({ ok: true, count: claims.length, shown: users.length, truncated: claims.length > MAX_LIST, users });
+  const out = { ok: true, count: claims.length, shown: users.length, truncated: claims.length > MAX_LIST, users };
+
+  /* ?diag=1：看一眼会话签名密钥的状态。
+     如果 secretCreatedAt 比用户的登录时间还新，说明密钥被重新生成过 ——
+     那之前发出的所有 Cookie 全部失效，这是「登录偶尔失效」最关键的证据。 */
+  if (new URL(context.request.url).searchParams.get("diag")) {
+    try {
+      const sec = await store.get("meta/secret.json", { type: "json", consistency: "strong" });
+      const counter = await store.get("meta/counter.json", { type: "json", consistency: "strong" });
+      out.diag = {
+        secretExists: !!(sec && sec.secret),
+        secretCreatedAt: (sec && sec.createdAt) || "",
+        secretLength: (sec && sec.secret) ? sec.secret.length : 0,
+        counterLastSid: (counter && counter.lastSid) || 0,
+        serverNow: new Date().toISOString(),
+      };
+    } catch (e) {
+      out.diag = { error: String(e && e.message ? e.message : e) };
+    }
+  }
+
+  return json(out);
 }
 
 export async function onRequestPost(context) {
