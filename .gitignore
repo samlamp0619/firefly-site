@@ -20,3 +20,8 @@ submissions-token.txt
 
 # Python 缓存（跑 build_font.py 时会生成）
 __pycache__/
+
+# 聊天桥的本地配置和日志（含 AstrBot API Key）
+astrbot-config.txt
+astrbot-last-response.txt
+chat-bridge.log
