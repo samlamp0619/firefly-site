@@ -416,9 +416,16 @@
 
   /* ---------- 启动 ---------- */
 
-  applyAuth(false);
-  api("/api/auth-me")
-    .then(d => { if (d && d.loggedIn) applyAuth(true); })
-    .catch(() => {})
-    .finally(() => loadFeed(true));
+  /* 登录状态由 auth.js 统一广播，这里只订阅。
+     以前是自己查一次 auth-me 就再也不更新，所以在弹窗里登录成功后，
+     发帖框不出现、点赞还提示未登录。 */
+  applyAuth(!!(window.__auth && window.__auth.loggedIn));
+  document.addEventListener("auth:change", e => {
+    const wasIn = !!me;
+    applyAuth(!!(e.detail && e.detail.loggedIn));
+    /* 从「未登录」变成「已登录」时重拉一次，让输入框和按钮状态跟上 */
+    if (!wasIn && e.detail && e.detail.loggedIn) loadFeed(true);
+  });
+
+  loadFeed(true);
 })();

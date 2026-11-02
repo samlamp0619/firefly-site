@@ -71,14 +71,21 @@ export async function onRequestGet(context) {
   const sig = token.slice(dot + 1);
 
   let valid = false;
+  let checked = false;          // 是否真的完成了一次验签
   try {
     const secret = await getSecret(store);
     const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["verify"]);
     valid = await crypto.subtle.verify("HMAC", key, b64urlDecode(sig), enc.encode(body));
+    checked = true;
   } catch {
-    valid = false;
+    /* 读密钥或验签过程中抛异常（比如存储偶发失败）——
+       这时候**不能**清 Cookie，否则一次抖动就把用户踢下线。
+       「登录偶尔失效」有一部分就是这个造成的。 */
+    return json({ ok: true, loggedIn: false, transient: true });
   }
-  if (!valid) {
+
+  if (!checked || !valid) {
+    /* 真的验签失败（签名不对 / 伪造），才清掉这个无效 Cookie */
     return json({ ok: true, loggedIn: false }, 200, {
       "Set-Cookie": "dsh_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0",
     });

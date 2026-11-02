@@ -150,6 +150,24 @@
     }
   }
 
+  /* 登录状态广播：auth.js 是唯一来源，其他模块（社区、聊天）订阅它。
+     以前社区页和聊天页各自在加载时查一次 auth-me 就再也不更新，
+     所以在弹窗里登录成功后，发帖框不出现、点赞还提示未登录。 */
+  function publish() {
+    const state = me
+      ? { loggedIn: true, sid: me.sid || "", username: me.username || "", qq: me.qq || "" }
+      : { loggedIn: false, sid: "", username: "", qq: "" };
+    window.__auth = state;
+    document.dispatchEvent(new CustomEvent("auth:change", { detail: state }));
+  }
+
+  /* 状态一变就同时更新徽标和广播 */
+  function setState(next) {
+    me = next;
+    refreshNav();
+    publish();
+  }
+
   /* ---------- 事件 ---------- */
 
   btn.addEventListener("click", open);
@@ -199,8 +217,7 @@
       setMsg(mode === "register" ? "正在注册，大约需要几秒，别关页面…" : "正在登录…", "wait");
 
       const data = await api(mode === "register" ? "/api/auth-register" : "/api/auth-login", body);
-      me = { username: data.username, sid: data.sid, qq: data.qq };
-      refreshNav();
+      setState({ username: data.username, sid: data.sid, qq: data.qq });
       showAccount(me);
       setMsg(mode === "register" ? "注册成功，你的 SID 是 " + data.sid : "登录成功", "ok");
       el.passwordInput.value = "";
@@ -216,8 +233,7 @@
     try {
       await api("/api/auth-logout", {});
     } catch { /* 清 Cookie 失败也让本地退出 */ }
-    me = null;
-    refreshNav();
+    setState(null);
     showForms();
     setMsg("已退出", "ok");
     el.logout.disabled = false;
@@ -225,15 +241,33 @@
 
   /* ---------- 初始化：问一次会话 ---------- */
 
-  refreshNav();
+  /* 先广播「未登录」，订阅方立刻就能渲染出正确形态，不会一直等接口 */
+  setState(null);
 
   api("/api/auth-me")
     .then(data => {
       if (data && data.loggedIn) {
-        me = { username: data.username, sid: data.sid, qq: data.qq || "" };
-        refreshNav();
+        setState({ username: data.username, sid: data.sid, qq: data.qq || "" });
       }
       return null;
     })
     .catch(() => { /* 接口挂了就当没登录 */ });
+
+  /* 标签页重新可见时复查一次：
+     浏览器可能把过期的 Cookie 清掉了，或者用户在别处登出，
+     这里只做「状态同步」，不会主动踢人 */
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return;
+    api("/api/auth-me")
+      .then(data => {
+        /* transient 表示服务端这次没验成（存储抖动），
+           不代表登录失效——不要因为一次抖动就把界面上的人踢下线 */
+        if (data && data.transient) return;
+        const now = !!(data && data.loggedIn);
+        if (now !== !!me) {
+          setState(now ? { username: data.username, sid: data.sid, qq: data.qq || "" } : null);
+        }
+      })
+      .catch(() => {});
+  });
 })();

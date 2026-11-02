@@ -207,8 +207,8 @@
   /* ---------- 启动 ---------- */
 
   restore();
-  applyAuth(false);
-  api("/api/auth-me")
-    .then(d => { if (d && d.loggedIn) applyAuth(true); })
-    .catch(() => setStatus("登录状态查询失败", "err"));
+  applyAuth(!!(window.__auth && window.__auth.loggedIn));
+  document.addEventListener("auth:change", e => {
+    applyAuth(!!(e.detail && e.detail.loggedIn));
+  });
 })();
