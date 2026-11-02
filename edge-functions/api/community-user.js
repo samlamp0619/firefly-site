@@ -42,8 +42,14 @@ function readCookie(request, name) {
 let SECRET_CACHE = null;
 async function getSecret() {
   if (SECRET_CACHE) return SECRET_CACHE;
-  const cur = await getStore(USERS).get("meta/secret.json", { type: "json", consistency: "strong" });
-  if (cur && cur.secret) { SECRET_CACHE = cur.secret; return SECRET_CACHE; }
+  /* 读会话密钥重试一次：冷启动时 Blob 偶发读失败会被当成「没登录」，
+     于是用户明明登录着却收到 401 —— 这类假 401 就是这么来的。 */
+  for (let i = 0; i < 2; i++) {
+    try {
+    const cur = await getStore(USERS).get("meta/secret.json", { type: "json", consistency: "strong" });
+      if (cur && cur.secret) { SECRET_CACHE = cur.secret; return SECRET_CACHE; }
+    } catch { /* 再试一次 */ }
+  }
   return null;
 }
 
