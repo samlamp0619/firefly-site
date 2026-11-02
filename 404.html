@@ -98,6 +98,13 @@
       .btn { transition: none; }
     }
   </style>
+  <!-- 会话 Cookie 带 Secure 标记，只有 HTTPS 才保存。从 http:// 进来会「登录成功但没存下 Cookie」，
+       所以这里强制跳一次。正式做法是在 EdgeOne 控制台开「强制 HTTPS」。 -->
+  <script>
+    if (location.protocol === "http:" && location.hostname !== "127.0.0.1" && location.hostname !== "localhost") {
+      location.replace("https://" + location.host + location.pathname + location.search + location.hash);
+    }
+  </script>
 </head>
 <body>
   <div class="wrap">

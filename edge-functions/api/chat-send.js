@@ -97,10 +97,20 @@ export async function onRequestPost(context) {
   const hasCookie = !!readCookie(context.request, "dsh_session");
   const me = await session(context.request);
   if (!me) {
+    /* 把请求协议一起返回：Cookie 带 Secure 标记，从 http:// 进来浏览器
+       根本不会保存它，表现就是「登录成功但服务端收不到」。
+       带上 proto 能一眼看出是不是这个原因。 */
+    const proto = (context.request.headers.get("x-forwarded-proto") || "").toLowerCase()
+      || new URL(context.request.url).protocol.replace(":", "");
     return json({
       ok: false,
-      error: hasCookie ? "登录状态已失效，请退出后重新登录" : "没有收到登录信息，请先登录",
+      error: hasCookie
+        ? "登录状态已失效，请退出后重新登录"
+        : (proto === "http"
+            ? "你正在用 http 访问，登录 Cookie 存不下来。请改用 https://samlamp.top"
+            : "没有收到登录信息，请先登录"),
       code: hasCookie ? "session_invalid" : "session_missing",
+      proto,
     }, 401);
   }
 
