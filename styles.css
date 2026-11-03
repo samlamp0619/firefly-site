@@ -186,6 +186,8 @@ main, header, footer { position: relative; z-index: 3; }
 }
 
 .logo {
+  flex: none;
+  white-space: nowrap;
   font-family: var(--font-head);
   font-size: 1.25rem;
   letter-spacing: 1px;
@@ -195,13 +197,18 @@ main, header, footer { position: relative; z-index: 3; }
   color: transparent;
 }
 
-.nav-links { display: flex; gap: 8px; list-style: none; }
+.nav-links { display: flex; gap: 6px; list-style: none; flex: none; }
 
+/* 导航有 10 项，原来左右各 16px 的内边距光留白就要吃掉 320px，
+   加上 logo 和访客统计会超出 1080 容器，导致每个链接被压成竖排。
+   压到 11px，并禁止换行 / 禁止压缩，宽度就稳定了。 */
 .nav-links a {
   display: block;
-  padding: 8px 16px;
+  padding: 8px 11px;
   border-radius: 999px;
   font-weight: 500;
+  white-space: nowrap;
+  flex: none;
   color: var(--ink-soft);
   transition: color 0.25s, background 0.25s, transform 0.25s;
 }
@@ -243,6 +250,7 @@ main, header, footer { position: relative; z-index: 3; }
 /* 右上角访客统计（不蒜子）胶囊 */
 .visit-counter {
   display: inline-flex;
+  flex: none;
   align-items: center;
   gap: 1px;
   margin-left: auto;
@@ -2779,4 +2787,8 @@ html[data-theme="dark"] .chat-bg {
 @media (max-width: 620px) {
   .page-nav { width: 100%; margin-left: 0; margin-top: 8px; justify-content: flex-start; }
   .comm-top, .chat-top { flex-wrap: wrap; }
+}
+/* 访客统计在中等宽度下会挤掉导航，收起来；宽屏仍然显示 */
+@media (max-width: 1240px) {
+  .site-header .visit-counter { display: none; }
 }
