@@ -394,10 +394,10 @@
 
   /* ---------- 登录状态 ---------- */
 
+  /* 登录入口统一在设置页；带上 next 参数，登录完自动回到社区 */
   function requireLogin() {
-    const badge = document.getElementById("sid-badge");
-    if (badge) badge.click();
-    setHint("登录后才能发帖和点赞～", "err");
+    const page = location.pathname.split("/").pop() || "community.html";
+    location.href = "settings.html?next=" + encodeURIComponent(page) + "#account";
   }
 
   function applyAuth(loggedIn) {

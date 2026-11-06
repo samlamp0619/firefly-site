@@ -74,50 +74,8 @@
     </div>
   </main>
 
-  <!-- 账号弹窗（和主页同一份逻辑，auth.js 需要这些节点） -->
-  <div class="auth-overlay" id="auth-overlay" hidden>
-    <div class="auth-modal glass" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
-      <button type="button" class="auth-close" id="auth-close" aria-label="关闭">✕</button>
-      <h2 class="auth-modal-title" id="auth-modal-title">登录</h2>
-
-      <div class="auth-account" id="auth-account-view" hidden>
-        <dl class="auth-facts">
-          <div><dt>用户名</dt><dd id="auth-my-name">—</dd></div>
-          <div><dt>SID</dt><dd class="auth-my-sid" id="auth-my-sid">—</dd></div>
-          <div><dt>QQ 号</dt><dd id="auth-my-qq">—</dd></div>
-        </dl>
-        <p class="auth-note">按注册先后发的号，注册后不会再变。</p>
-        <button type="button" class="btn btn-ghost auth-submit" id="auth-logout">退出登录</button>
-      </div>
-
-      <div class="auth-forms" id="auth-forms">
-        <div class="auth-tabs" role="tablist">
-          <button type="button" class="auth-tab is-active" data-mode="login" role="tab" aria-selected="true">登录</button>
-          <button type="button" class="auth-tab" data-mode="register" role="tab" aria-selected="false">注册</button>
-        </div>
-
-        <form class="auth-form" id="auth-form" novalidate>
-          <label class="auth-field">
-            <span class="auth-label" id="auth-account-label">用户名</span>
-            <input type="text" id="auth-account" autocomplete="username" maxlength="40" placeholder="注册时填的用户名" />
-          </label>
-
-          <label class="auth-field" id="auth-qq-field" hidden>
-            <span class="auth-label">QQ 号<span class="auth-hint">用于保证一个 QQ 只能注册一个号</span></span>
-            <input type="text" id="auth-qq" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="5~12 位数字" />
-          </label>
-
-          <label class="auth-field">
-            <span class="auth-label" id="auth-password-label">密码</span>
-            <input type="password" id="auth-password" autocomplete="current-password" maxlength="72" />
-          </label>
-
-          <p class="auth-msg" id="auth-msg" role="status"></p>
-          <button type="submit" class="btn btn-primary auth-submit" id="auth-submit">登录账号</button>
-        </form>
-      </div>
-    </div>
-  </div>
+  <!-- 账号弹窗已经收进 settings.html，这里只留左下角的状态灯，
+       点它跳到设置页。会话状态由 auth.js 广播给社区 / 聊天模块。 -->
 
   <script defer src="auth.js"></script>
   <script defer src="chat.js"></script>

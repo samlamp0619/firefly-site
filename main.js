@@ -25,6 +25,17 @@
   // 由 refresh_bg.py 生成的实时图（bg-realtime.js 注入），file:// 打开也兼容
   let realtimeBg = Array.isArray(window.REALTIME_BG) ? window.REALTIME_BG : [];
 
+  /* 设置页的「换一批」把结果写进 bg-live-pool，这里优先用它。
+     否则用户刚在设置页换完图，一回到首页还是旧的，很怪。 */
+  (function readLivePool() {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem("bg-live-pool") || "null"); } catch { saved = null; }
+    if (!saved || !Array.isArray(saved.items) || !saved.items.length) return;
+    /* 超过 24 小时就当过期，回到默认池子，免得一直显示很旧的图 */
+    if (saved.ts && Date.now() - saved.ts > 24 * 3600 * 1000) return;
+    realtimeBg = saved.items.concat(realtimeBg);
+  })();
+
   // 「只看实时」开关：默认关，记忆在 localStorage
   let rtOnly = false;
   try { rtOnly = localStorage.getItem("bg-rt-only") === "1"; } catch {}

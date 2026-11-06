@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="账号、外观和背景设置。" />
+  <meta name="theme-color" content="#0d181c" />
+  <title>设置 · 萨姆萤光灯</title>
+
+  <script>
+    (function () {
+      var dark = true;
+      try {
+        var saved = localStorage.getItem("theme");
+        if (saved) dark = saved === "dark";
+      } catch (e) { /* 无 localStorage 时按默认深色走 */ }
+      document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+      var m = document.querySelector('meta[name="theme-color"]');
+      if (m) m.setAttribute("content", dark ? "#0d181c" : "#fdf2ff");
+    })();
+  </script>
+
+  <script>
+    if (location.protocol === "http:" && location.hostname !== "127.0.0.1" && location.hostname !== "localhost") {
+      location.replace("https://" + location.host + location.pathname + location.search + location.hash);
+    }
+  </script>
+
+  <link rel="stylesheet" href="assets/fonts/fonts.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="settings-page" data-page="settings">
+
+  <div class="chat-bg" aria-hidden="true"></div>
+
+  <header class="comm-top">
+    <a class="comm-back" href="index.html">← 主页</a>
+    <h1 class="comm-top-title">设置</h1>
+    <nav class="page-nav" aria-label="站内导航">
+      <a href="index.html#schedule">排期</a>
+      <a href="community.html">社区</a>
+      <a href="chat.html">对话 →</a>
+    </nav>
+  </header>
+
+  <main class="settings-main">
+
+    <!-- ================= 账号 ================= -->
+    <section class="settings-card glass" id="account">
+      <div class="settings-head">
+        <h2>账号</h2>
+        <span class="settings-sub" id="acct-sub">未登录</span>
+      </div>
+
+      <!-- 未登录：登录 / 注册 -->
+      <div id="acct-forms">
+        <div class="auth-tabs" role="tablist">
+          <button type="button" class="auth-tab is-active" data-mode="login" role="tab" aria-selected="true">登录</button>
+          <button type="button" class="auth-tab" data-mode="register" role="tab" aria-selected="false">注册</button>
+        </div>
+
+        <form class="auth-form" id="acct-form" novalidate>
+          <label class="auth-field">
+            <span class="auth-label" id="acct-account-label">用户名</span>
+            <input type="text" id="acct-account" autocomplete="username" maxlength="40" placeholder="注册时填的用户名" />
+          </label>
+
+          <label class="auth-field" id="acct-qq-field" hidden>
+            <span class="auth-label">QQ 号<span class="auth-hint">一个 QQ 只能注册一个号</span></span>
+            <input type="text" id="acct-qq" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="5~12 位数字" />
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-label" id="acct-password-label">密码</span>
+            <input type="password" id="acct-password" autocomplete="current-password" maxlength="72" />
+          </label>
+
+          <p class="auth-msg" id="acct-msg" role="status"></p>
+          <button type="submit" class="btn btn-primary auth-submit" id="acct-submit">登录账号</button>
+        </form>
+      </div>
+
+      <!-- 已登录 -->
+      <div id="acct-view" hidden>
+        <dl class="auth-facts">
+          <div><dt>用户名</dt><dd id="acct-name">—</dd></div>
+          <div><dt>SID</dt><dd class="auth-my-sid" id="acct-sid">—</dd></div>
+          <div><dt>QQ 号</dt><dd id="acct-user-qq">—</dd></div>
+        </dl>
+        <p class="auth-note">SID 按注册先后发放，注册后不会变。</p>
+        <button type="button" class="btn btn-ghost auth-submit" id="acct-logout">退出登录</button>
+      </div>
+    </section>
+
+    <!-- ================= 外观 ================= -->
+    <section class="settings-card glass" id="appearance">
+      <div class="settings-head">
+        <h2>外观</h2>
+        <span class="settings-sub">跟着系统走，也可以手动钉住</span>
+      </div>
+
+      <div class="settings-row">
+        <div class="settings-row-text">
+          <b>主题</b>
+          <span>深色护眼，浅色适合白天</span>
+        </div>
+        <div class="seg" id="theme-seg" role="group" aria-label="主题">
+          <button type="button" data-theme-value="dark">深色</button>
+          <button type="button" data-theme-value="light">浅色</button>
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <div class="settings-row-text">
+          <b>跟随系统</b>
+          <span>开启后系统换主题，这里也跟着换</span>
+        </div>
+        <button type="button" class="switch" id="theme-auto" role="switch" aria-checked="true">
+          <span class="switch-thumb"></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= 背景 ================= -->
+    <section class="settings-card glass" id="background">
+      <div class="settings-head">
+        <h2>背景</h2>
+        <span class="settings-sub" id="bg-credit">—</span>
+      </div>
+
+      <div class="settings-row">
+        <div class="settings-row-text">
+          <b>只看实时图</b>
+          <span>关闭时会混入本地兜底图，断网也不空白</span>
+        </div>
+        <button type="button" class="switch" id="bg-rt-only" role="switch" aria-checked="false">
+          <span class="switch-thumb"></span>
+        </button>
+      </div>
+
+      <div class="settings-row">
+        <div class="settings-row-text">
+          <b>换一批</b>
+          <span>从 Pixiv 镜像实时拉取新的流萤图</span>
+        </div>
+        <button type="button" class="btn btn-primary settings-btn" id="bg-refresh">换一批</button>
+      </div>
+    </section>
+
+    <!-- ================= 关于 ================= -->
+    <section class="settings-card glass" id="about">
+      <div class="settings-head">
+        <h2>关于</h2>
+        <span class="settings-sub">萨姆萤光灯</span>
+      </div>
+
+      <dl class="auth-facts settings-facts">
+        <div><dt>站点</dt><dd><a href="index.html">samlamp.top</a></dd></div>
+        <div><dt>社区</dt><dd><a href="community.html">发帖 · 评论 · 点赞</a></dd></div>
+        <div><dt>在线对话</dt><dd><a href="chat.html">和 bot 聊天</a></dd></div>
+        <div><dt>B 站</dt><dd><a href="https://space.bilibili.com/669867138" target="_blank" rel="noopener noreferrer">空间主页</a></dd></div>
+      </dl>
+
+      <p class="auth-note settings-note">
+        设置都存在这台设备的浏览器里（主题、背景偏好），换设备要重新设一次。
+        账号状态是登录 Cookie，跟浏览器绑定。
+      </p>
+    </section>
+
+  </main>
+
+  <script defer src="auth.js"></script>
+  <script defer src="settings.js"></script>
+</body>
+</html>

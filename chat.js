@@ -180,9 +180,10 @@
 
   /* ---------- 登录状态 ---------- */
 
+  /* 登录入口统一在设置页；带上 next 参数，登录完自动回到对话页 */
   function requireLogin() {
-    const badge = document.getElementById("sid-badge");
-    if (badge) badge.click();
+    const page = location.pathname.split("/").pop() || "chat.html";
+    location.href = "settings.html?next=" + encodeURIComponent(page) + "#account";
   }
 
   function applyAuth(loggedIn) {
