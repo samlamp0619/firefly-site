@@ -50,8 +50,35 @@ export async function onRequestGet(context) {
   }
 
   /* ?raw=1：不做统计，直接把 get / list 的原始结果掏出来。
-     用来判断是「list 被拒」还是「命名空间里根本没数据」。 */
-  if (url.searchParams.get("raw")) {
+     用来判断是「list 被拒」还是「命名空间里根本没数据」。
+     ?raw=2：把 list 的各种参数组合都试一遍，看是不是调用方式的问题。 */
+  const rawMode = url.searchParams.get("raw");
+  if (rawMode === "2") {
+    const out = { ok: true, combos: {} };
+    const tryList = async (label, params, storeName) => {
+      try {
+        const r = await getStore(storeName || USERS).list(params);
+        out.combos[label] = { ok: true, n: r.blobs.length, sample: r.blobs.slice(0, 3).map(b => b.key) };
+      } catch (e) {
+        const m = String(e && e.message ? e.message : e);
+        const code = (m.match(/<Code>([^<]+)<\/Code>/) || [])[1] || "";
+        out.combos[label] = { ok: false, code, short: m.slice(0, 120) };
+      }
+    };
+
+    await tryList("list()", {});
+    await tryList("list({prefix})", { prefix: "users/" });
+    await tryList("list({prefix,delimiter})", { prefix: "users/", delimiter: "/" });
+    await tryList("list({delimiter})", { delimiter: "/" });
+    await tryList("list({prefix,limit})", { prefix: "users/", limit: 10 });
+    await tryList("list({prefix,consistency})", { prefix: "users/", consistency: "strong" });
+    await tryList("list({prefix,delimiter,limit})", { prefix: "users/", delimiter: "/", limit: 10 });
+    await tryList("community list({prefix,delimiter})", { prefix: "posts/", delimiter: "/" }, COMMUNITY);
+
+    return json(out);
+  }
+
+  if (rawMode) {
     const out = { ok: true, raw: {} };
     const probe = async (label, storeName, fn) => {
       try {
