@@ -49,6 +49,28 @@ export async function onRequestGet(context) {
     return json({ ok: false, error: "unauthorized" }, 401);
   }
 
+  /* ?raw=1：不做统计，直接把 get / list 的原始结果掏出来。
+     用来判断是「list 被拒」还是「命名空间里根本没数据」。 */
+  if (url.searchParams.get("raw")) {
+    const out = { ok: true, raw: {} };
+    const probe = async (label, storeName, fn) => {
+      try {
+        out.raw[label] = { ok: true, value: await fn(getStore(storeName)) };
+      } catch (e) {
+        const m = String(e && e.message ? e.message : e);
+        out.raw[label] = { ok: false, error: m.slice(0, 300) };
+      }
+    };
+
+    await probe("users.get(meta/secret)", USERS, s => s.get("meta/secret.json", { type: "json", consistency: "strong" }).then(v => v ? { hasSecret: !!v.secret, len: (v.secret || "").length, createdAt: v.createdAt } : null));
+    await probe("users.list('')", USERS, s => s.list({ consistency: "strong" }).then(r => r.blobs.slice(0, 8).map(b => b.key)));
+    await probe("users.list('users/')", USERS, s => s.list({ prefix: "users/", consistency: "strong" }).then(r => r.blobs.slice(0, 8).map(b => b.key)));
+    await probe("community.list('')", COMMUNITY, s => s.list({ consistency: "strong" }).then(r => r.blobs.slice(0, 8).map(b => b.key)));
+    await probe("chat.list('')", CHAT, s => s.list({ consistency: "strong" }).then(r => r.blobs.slice(0, 8).map(b => b.key)));
+
+    return json(out);
+  }
+
   const userStore = getStore(USERS);
   const commStore = getStore(COMMUNITY);
   const chatStore = getStore(CHAT);
