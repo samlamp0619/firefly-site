@@ -36,14 +36,15 @@ function bjDay(offsetDays) {
 async function safeList(store, prefix) {
   try {
     const r = await store.list({ prefix, consistency: "strong" });
-    return r.blobs.map(b => b.key);
-  } catch {
-    return [];
+    return { keys: r.blobs.map(b => b.key), error: "" };
+  } catch (e) {
+    return { keys: [], error: String(e && e.message ? e.message : e) };
   }
 }
 
 export async function onRequestGet(context) {
-  const token = new URL(context.request.url).searchParams.get("token") || "";
+  const url = new URL(context.request.url);
+  const token = url.searchParams.get("token") || "";
   if (!token || (await sha256Hex(token)) !== TOKEN_SHA256) {
     return json({ ok: false, error: "unauthorized" }, 401);
   }
@@ -53,7 +54,7 @@ export async function onRequestGet(context) {
   const chatStore = getStore(CHAT);
 
   /* 并行取各类键，任何一路失败都不拖垮整体 */
-  const [userKeys, postKeys, commentKeys, likeKeys, quotaKeys, answerKeys, queueKeys] = await Promise.all([
+  const [u, p, c, l, q, a, qu] = await Promise.all([
     safeList(userStore, "users/"),
     safeList(commStore, "posts/"),
     safeList(commStore, "comments/"),
@@ -62,6 +63,14 @@ export async function onRequestGet(context) {
     safeList(chatStore, "answers/"),
     safeList(chatStore, "queue/"),
   ]);
+
+  const userKeys = u.keys;
+  const postKeys = p.keys;
+  const commentKeys = c.keys;
+  const likeKeys = l.keys;
+  const quotaKeys = q.keys;
+  const answerKeys = a.keys;
+  const queueKeys = qu.keys;
 
   const accountKeys = userKeys.filter(k => /^users\/[a-f0-9]{32}\.json$/.test(k));
   const posts = postKeys.filter(k => /^posts\/\d+-[a-z0-9]+\.json$/.test(k));
@@ -115,6 +124,18 @@ export async function onRequestGet(context) {
     week: days,
     serverNow: new Date().toISOString(),
     today,
+    /* ?debug=1：把每路 list 的原始结果掏出来看，排查用 */
+    ...(url.searchParams.get("debug") ? {
+      debug: {
+        users: { n: userKeys.length, sample: userKeys.slice(0, 3), error: u.error },
+        posts: { n: postKeys.length, sample: postKeys.slice(0, 3), error: p.error },
+        comments: { n: commentKeys.length, sample: commentKeys.slice(0, 3), error: c.error },
+        likes: { n: likeKeys.length, error: l.error },
+        quota: { n: quotaKeys.length, sample: quotaKeys.slice(0, 3), error: q.error },
+        answers: { n: answerKeys.length, error: a.error },
+        queue: { n: queueKeys.length, error: qu.error },
+      },
+    } : {}),
   });
 }
 
