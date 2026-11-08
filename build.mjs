@@ -176,7 +176,7 @@ await bakeCounter();
 log("");
 log("[3/3] 给静态资源加内容哈希");
 const total = [];
-for (const page of ["index.html", "404.html", "exam.html", "community.html", "chat.html", "settings.html"]) {
+for (const page of ["index.html", "404.html", "exam.html", "community.html", "chat.html", "settings.html", "p-dsfdt3i28u.html"]) {
   total.push(...processHtml(join(HERE, page)));
 }
 

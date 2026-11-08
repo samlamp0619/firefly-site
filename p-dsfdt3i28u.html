@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#0d181c" />
+  <title>萨姆萤光灯</title>
+
+  <script>
+    (function () {
+      var dark = true;
+      try {
+        var saved = localStorage.getItem("theme");
+        if (saved) dark = saved === "dark";
+      } catch (e) { /* 无 localStorage 时按默认深色走 */ }
+      document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    })();
+  </script>
+
+  <script>
+    if (location.protocol === "http:" && location.hostname !== "127.0.0.1" && location.hostname !== "localhost") {
+      location.replace("https://" + location.host + location.pathname + location.search + location.hash);
+    }
+  </script>
+
+  <link rel="stylesheet" href="assets/fonts/fonts.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="admin-page" data-page="admin">
+
+  <div class="chat-bg" aria-hidden="true"></div>
+
+  <header class="comm-top">
+    <a class="comm-back" href="index.html">← 主页</a>
+    <h1 class="comm-top-title">控制台</h1>
+    <nav class="page-nav" aria-label="站内导航">
+      <a href="settings.html">设置</a>
+      <button type="button" class="admin-logout" id="admin-logout" hidden>退出</button>
+    </nav>
+  </header>
+
+  <main class="admin-main">
+
+    <!-- ================= 登录 ================= -->
+    <section class="settings-card glass" id="admin-login">
+      <div class="settings-head">
+        <h2>管理员令牌</h2>
+        <span class="settings-sub">只存在这台设备的浏览器里</span>
+      </div>
+
+      <form id="admin-login-form" novalidate>
+        <label class="auth-field">
+          <span class="auth-label">Token</span>
+          <input type="password" id="admin-token" autocomplete="off" spellcheck="false"
+            placeholder="粘贴管理员 token" />
+        </label>
+        <p class="auth-msg" id="admin-login-msg" role="status"></p>
+        <button type="submit" class="btn btn-primary auth-submit" id="admin-login-submit">进入后台</button>
+      </form>
+    </section>
+
+    <!-- ================= 主体 ================= -->
+    <div id="admin-body" hidden>
+
+      <!-- 概览 -->
+      <section class="settings-card glass">
+        <div class="settings-head">
+          <h2>概览</h2>
+          <span class="settings-sub" id="admin-updated">—</span>
+        </div>
+        <div class="admin-stats" id="admin-stats">
+          <div class="admin-stat"><b id="st-accounts">—</b><span>账号</span></div>
+          <div class="admin-stat"><b id="st-verified">—</b><span>黄V</span></div>
+          <div class="admin-stat"><b id="st-posts">—</b><span>帖子</span></div>
+          <div class="admin-stat"><b id="st-comments">—</b><span>评论</span></div>
+          <div class="admin-stat"><b id="st-likes">—</b><span>点赞</span></div>
+          <div class="admin-stat"><b id="st-today-chat">—</b><span>今日对话</span></div>
+        </div>
+        <div class="admin-week" id="admin-week"></div>
+      </section>
+
+      <!-- 账号 -->
+      <section class="settings-card glass">
+        <div class="settings-head">
+          <h2>账号</h2>
+          <span class="settings-sub" id="acct-count">—</span>
+        </div>
+
+        <div class="admin-toolbar">
+          <input type="search" id="acct-search" placeholder="搜用户名 / SID / QQ" />
+          <button type="button" class="btn btn-ghost admin-mini" id="acct-reload">刷新</button>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="acct-table">
+            <thead>
+              <tr>
+                <th>SID</th><th>用户名</th><th>QQ</th><th>认证</th><th>注册时间</th><th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="acct-tbody"></tbody>
+          </table>
+        </div>
+        <p class="admin-empty" id="acct-empty" hidden>没有匹配的账号</p>
+      </section>
+
+      <!-- 社区 -->
+      <section class="settings-card glass">
+        <div class="settings-head">
+          <h2>社区</h2>
+          <span class="settings-sub" id="post-count">—</span>
+        </div>
+
+        <div class="admin-toolbar">
+          <button type="button" class="btn btn-ghost admin-mini" id="post-reload">刷新</button>
+          <button type="button" class="btn btn-ghost admin-mini" id="post-more">加载更多</button>
+        </div>
+
+        <div id="post-list" class="admin-post-list"></div>
+        <p class="admin-empty" id="post-empty" hidden>还没有帖子</p>
+      </section>
+
+      <!-- 诊断 -->
+      <section class="settings-card glass">
+        <div class="settings-head">
+          <h2>诊断</h2>
+          <span class="settings-sub">出问题时看这里</span>
+        </div>
+        <dl class="auth-facts settings-facts" id="diag-list">
+          <div><dt>会话密钥</dt><dd id="dg-secret">—</dd></div>
+          <div><dt>密钥创建</dt><dd id="dg-secret-at">—</dd></div>
+          <div><dt>号段游标</dt><dd id="dg-counter">—</dd></div>
+          <div><dt>当前时间</dt><dd id="dg-now">—</dd></div>
+        </dl>
+        <div class="admin-toolbar admin-toolbar-top">
+          <button type="button" class="btn btn-ghost admin-mini" id="dg-refresh">刷新</button>
+          <button type="button" class="btn btn-ghost admin-mini" id="dg-recount">重算号段</button>
+        </div>
+        <p class="auth-note settings-note">
+          密钥创建时间如果比某个用户的注册时间还新，说明密钥被换过，那个用户得重新登录。
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <script defer src="p-dsfdt3i28u.js"></script>
+</body>
+</html>

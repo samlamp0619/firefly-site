@@ -2958,3 +2958,266 @@ html[data-theme="dark"] .chat-bg {
   background: rgba(127, 127, 127, 0.26);
   transform: rotate(30deg);
 }
+
+/* ============================================================
+   管理后台（admin.html）
+   ============================================================ */
+
+.admin-main {
+  width: min(1080px, 94%);
+  margin: 0 auto;
+  padding: 22px 0 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-logout {
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.admin-logout:hover { color: #e2565a; border-color: #e2565a; }
+
+/* ---------- 概览数字 ---------- */
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+}
+
+.admin-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px;
+  border-radius: 12px;
+  background: rgba(127, 127, 127, 0.1);
+  border: 1px solid var(--card-border);
+}
+
+.admin-stat b {
+  font-family: var(--font-head);
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--purple);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-stat span { font-size: 0.72rem; color: var(--ink-soft); }
+
+/* 最近 7 天柱状图 */
+.admin-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  align-items: end;
+  height: 92px;
+  margin-top: 16px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--card-border);
+}
+
+.admin-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  height: 100%;
+}
+
+.admin-bar i {
+  display: block;
+  width: 100%;
+  max-width: 34px;
+  min-height: 3px;
+  border-radius: 4px 4px 2px 2px;
+  background: linear-gradient(180deg, var(--purple), rgba(46, 196, 182, 0.35));
+}
+
+.admin-bar em {
+  font-size: 0.62rem;
+  font-style: normal;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 工具条 ---------- */
+
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-toolbar-top { margin-top: 14px; margin-bottom: 0; }
+
+.admin-toolbar input[type="search"] {
+  flex: 1;
+  min-width: 180px;
+  font: inherit;
+  font-size: 0.84rem;
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: var(--ink);
+  background: rgba(127, 127, 127, 0.12);
+  border: 1.5px solid rgba(127, 127, 127, 0.3);
+}
+
+.admin-toolbar input[type="search"]:focus {
+  outline: none;
+  border-color: var(--purple);
+}
+
+.admin-mini { font-size: 0.78rem; padding: 7px 14px; }
+
+/* ---------- 表格 ---------- */
+
+.admin-table-wrap { overflow-x: auto; }
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  min-width: 620px;
+}
+
+.admin-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  padding: 6px 10px 8px;
+  border-bottom: 1px solid var(--card-border);
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.1);
+  color: var(--ink);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:hover { background: rgba(127, 127, 127, 0.06); }
+
+.admin-sid { font-family: ui-monospace, monospace; font-weight: 700; color: var(--purple); }
+.admin-qq { font-variant-numeric: tabular-nums; }
+.admin-when { color: var(--ink-soft); font-size: 0.76rem; white-space: nowrap; }
+.admin-ops { white-space: nowrap; text-align: right; }
+
+.admin-v {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 900;
+  color: #3d2c00;
+  background: linear-gradient(145deg, #ffd54a, #f5b301);
+}
+
+.admin-nov { color: var(--ink-soft); font-size: 0.76rem; }
+
+/* ---------- 行内按钮 ---------- */
+
+.admin-op {
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  margin-left: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+}
+
+.admin-op:hover { color: var(--ink); background: rgba(127, 127, 127, 0.14); }
+.admin-op:disabled { opacity: 0.45; cursor: default; }
+.admin-op.is-danger:hover { color: #e2565a; border-color: #e2565a; background: rgba(226, 86, 90, 0.1); }
+
+/* ---------- 帖子列表 ---------- */
+
+.admin-post-list { display: flex; flex-direction: column; gap: 10px; }
+
+.admin-post {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(127, 127, 127, 0.08);
+  border: 1px solid var(--card-border);
+}
+
+.admin-post-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.admin-post-head b { font-size: 0.84rem; color: var(--ink); }
+.admin-post-meta { font-size: 0.72rem; color: var(--ink-soft); }
+
+.admin-post-body {
+  font-size: 0.86rem;
+  line-height: 1.65;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.admin-post-foot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+}
+
+.admin-post-foot > span { margin-right: auto; }
+
+/* 评论 */
+.admin-comments {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--card-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-comment { padding-left: 10px; border-left: 2px solid var(--card-border); }
+.admin-comment-head { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+.admin-comment-head b { font-size: 0.8rem; color: var(--ink); }
+.admin-comment-body { font-size: 0.82rem; line-height: 1.6; color: var(--ink); white-space: pre-wrap; word-break: break-word; }
+
+.admin-empty, .admin-tip {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  text-align: center;
+  padding: 18px 0;
+}
+
+@media (max-width: 620px) {
+  .admin-main { width: 94%; padding-top: 16px; }
+  .admin-stats { grid-template-columns: repeat(3, 1fr); }
+  .admin-stat b { font-size: 1.25rem; }
+  .admin-week { height: 76px; }
+}
