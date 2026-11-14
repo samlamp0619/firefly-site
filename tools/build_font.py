@@ -27,7 +27,7 @@ import sys
 import urllib.parse
 import urllib.request
 
-SITE = os.path.dirname(os.path.abspath(__file__))
+SITE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 本脚本在 tools/，站点根是上一级
 OUT_DIR = os.path.join(SITE, "assets", "fonts")
 FAMILY = "ZCOOL KuaiLe"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "

@@ -11,26 +11,44 @@
 personal-website/
 ├── index.html          # 页面结构与全部内容
 ├── styles.css          # 全部样式（青绿色主题 + 深色模式）
-├── main.js             # 背景轮播、实时刷新、主题切换、粒子、导航、动画
+├── main.js             # 背景轮播、主题切换、粒子、导航、动画
 ├── schedule.js         # 「发稿计划」表格数据 + 按日期自动着色
 ├── projects.js         # 「我的作品」栏渲染（读 videos.js，勿手改）
-├── videos.js           # B站投稿数据（由 refresh_videos.py 生成，勿手改）
-├── bg-realtime.js      # 实时背景池（由 refresh_bg.py 生成，勿手改）
-├── refresh_videos.py   # 同步 B站投稿列表
-├── refresh_bg.py       # 实时拉取 Pixiv 镜像流萤图
-├── optimize_bg.ps1     # 背景图压缩（拉完新图跑一次）
-├── build_font.py       # 生成标题字体子集
+├── videos.js           # B站投稿数据（由 tools/refresh_videos.py 生成，勿手改）
+├── bg-realtime.js      # 实时背景池（由 tools/refresh_bg.py 生成，勿手改）
+├── community.html/js   # 社区（发帖 / 评论 / 点赞）
+├── chat.html/js        # 在线对话
+├── settings.html/js    # 设置页（账号 / 外观 / 背景）
+├── auth.js             # 全站登录状态（广播给各模块）
+├── styles.css          # 样式总表
 ├── 404.html            # 自定义 404 页（样式内联，自包含）
+├── build.mjs           # 构建脚本（EdgeOne 用：加哈希、跑视频同步）
+├── refresh-videos.mjs  # build.mjs 调用的视频同步
+├── edge-functions/     # 服务端接口（账号 / 社区 / 聊天 / 后台）
 ├── assets/
 │   ├── avatar.jpg      # B站头像
-│   ├── fonts/          # 标题字体子集（由 build_font.py 生成）
+│   ├── fonts/          # 标题字体子集（由 tools/build_font.py 生成）
 │   └── bg/             # 本地兜底背景图 + realtime/（实时图）
+├── tools/              # 本地工具脚本，不参与网站运行
+│   ├── manage-accounts.ps1 + 管理账号.bat        # 命令行管账号（网页版是后台页）
+│   ├── chat-bridge.ps1 + 启动聊天桥.bat          # 聊天桥（跑在 AstrBot 那台电脑）
+│   ├── pull-submissions.ps1 + 拉取投稿.bat       # 导出投稿 → 投稿汇总.xlsx
+│   ├── pull-exam-results.ps1 + 拉取考核成绩.bat  # 导出考核 → 考核成绩.xlsx
+│   ├── sync-and-push.ps1 + 同步投稿.bat          # 同步 B站数据并推送
+│   ├── deploy-github.bat                          # 一键部署
+│   ├── refresh_videos.py / refresh_bg.py          # 生成 videos.js / bg-realtime.js
+│   ├── build_font.py                              # 生成标题字体子集
+│   ├── optimize_bg.ps1                            # 背景图压缩
+│   └── submissions-token.txt                      # 管理令牌（不进仓库）
 └── README.md
 ```
 
+> 工具脚本都在 `tools/`，脚本里会自动把「站点根」认成上一级目录，
+> 所以直接双击 bat 就能跑，不用先 cd 回项目根。
+
 > 三条自动生成的链路，都别手改产物，改源头再重跑脚本：
-> `refresh_videos.py → videos.js`、`refresh_bg.py → bg-realtime.js`、
-> `build_font.py → assets/fonts/`。
+> `tools/refresh_videos.py → videos.js`、`tools/refresh_bg.py → bg-realtime.js`、
+> `tools/build_font.py → assets/fonts/`。
 
 ## 已配置的真实信息
 
@@ -90,7 +108,7 @@ Vercount 有个**只读**接口（`GET /api/v2/log?url=...`，返回 `Data retri
 | 表单界面 | `index.html` 的 `#survey` 段 + `survey.js` |
 | 提交接口 | `edge-functions/api/submit.js` → `POST /api/submit` |
 | 读取接口 | `edge-functions/api/submissions.js` → `GET /api/submissions?token=…` |
-| 本地取数 | `拉取投稿.bat` + `pull-submissions.ps1` → 生成 `投稿汇总.xlsx` |
+| 本地取数 | `tools/拉取投稿.bat` + `pull-submissions.ps1` → 生成 `投稿汇总.xlsx` |
 
 ### 表单字段
 
@@ -148,7 +166,7 @@ Vercount 有个**只读**接口（`GET /api/v2/log?url=...`，返回 `Data retri
 | 发会话 | `edge-functions/api/exam-start.js` → `POST /api/exam-start` |
 | 交卷批改 | `edge-functions/api/exam-submit.js` → `POST /api/exam-submit` |
 | 成绩读取 / 删除 | `edge-functions/api/exam-results.js` |
-| 导出 | `拉取考核成绩.bat` + `pull-exam-results.ps1` → `考核成绩.xlsx` |
+| 导出 | `tools/拉取考核成绩.bat` + `pull-exam-results.ps1` → `考核成绩.xlsx` |
 
 ### 分值（卷面 100 分制，实际作答最高 96）
 
@@ -250,7 +268,7 @@ EdgeOne 的默认浏览器缓存策略是**看文件名里有没有哈希**：
 ### 「只看实时」开关（右下角）
 
 - 开启后轮播池**只保留实时拉取的图**，不显示本地兜底图；开关状态会记住（localStorage）。
-- 开启但当前没有实时图时，页面保持薄荷渐变底并提示「暂无实时图」，点「🔄 换一批」或运行 `refresh_bg.py` 即可。
+- 开启但当前没有实时图时，页面保持薄荷渐变底并提示「暂无实时图」，点「🔄 换一批」或运行 `tools/refresh_bg.py` 即可。
 - 关闭后恢复「实时 + 本地」混合轮播。
 
 ### 实时池（Pixiv 镜像实时图）
@@ -259,8 +277,8 @@ EdgeOne 的默认浏览器缓存策略是**看文件名里有没有哈希**：
 
    ```bash
    cd personal-website
-   python refresh_bg.py          # 默认拉 10 条、保存最多 8 张
-   python refresh_bg.py 20       # 自定义数量
+   cd tools; python refresh_bg.py   # 默认拉 10 条、保存最多 8 张
+   cd tools; python refresh_bg.py 20 # 自定义数量
    ```
 
 2. 脚本通过 **lolicon API**（服务端请求不受 CORS 限制）按 `tag=流萤`、`r18=0`（仅 SFW）、`excludeAI=1`（排除 AI 图）实时获取 Pixiv 作品，从 **i.pixiv.re 镜像**下载原图到 `assets/bg/realtime/`，并生成 `bg-realtime.js`。

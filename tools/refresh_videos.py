@@ -196,7 +196,7 @@ def fetch_followers():
 
 
 def main():
-    here = os.path.dirname(os.path.abspath(__file__))
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 本脚本在 tools/，站点根是上一级
     out_path = os.path.join(here, OUT_FILE)
 
     print("=" * 52)

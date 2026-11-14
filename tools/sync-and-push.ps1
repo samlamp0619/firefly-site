@@ -15,7 +15,7 @@
 $ErrorActionPreference = "Continue"
 
 # 切到脚本所在目录（也就是仓库根目录）
-Set-Location -LiteralPath $PSScriptRoot
+Set-Location -LiteralPath (Split-Path -Parent $PSScriptRoot)   # 本脚本在 tools/，git 仓库在上一级
 
 function Step($n, $text) {
   Write-Host ""

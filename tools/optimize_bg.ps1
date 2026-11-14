@@ -1,4 +1,4 @@
-# 萨姆萤光灯 · 背景图压缩
+﻿# 萨姆萤光灯 · 背景图压缩
 # 用 .NET GDI+ 把 assets/bg 下的背景图统一压成「最宽 1920px 的 JPEG」。
 # 原图是 4~8MB 的 PNG，压完通常几百 KB，首屏体积能降 90%+。
 #
@@ -15,7 +15,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 
-$site = Split-Path -Parent $MyInvocation.MyCommand.Path
+$site = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)   # 本脚本在 tools/，站点根是上一级
 $bgDir = Join-Path $site 'assets\bg'
 $jpgCodec = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() |
             Where-Object { $_.MimeType -eq 'image/jpeg' }

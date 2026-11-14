@@ -1,6 +1,6 @@
 /* 管理后台
  * ============================================================
- * 鉴权就一个管理员 token，存在 sessionStorage（关掉标签页就没了）。
+ * 鉴权就一个管理员 token，存在 localStorage（关掉标签页就没了）。
  * 所有接口都带 ?token= 或 body 里带 token，服务端用 SHA-256 比对。
  *
  * 页面本身不含任何数据，全部走接口，所以直接访问 admin.html
@@ -21,13 +21,13 @@
   }
 
   function token() {
-    try { return sessionStorage.getItem(TOKEN_KEY) || ""; } catch { return ""; }
+    try { return localStorage.getItem(TOKEN_KEY) || ""; } catch { return ""; }
   }
 
   function setToken(v) {
     try {
-      if (v) sessionStorage.setItem(TOKEN_KEY, v);
-      else sessionStorage.removeItem(TOKEN_KEY);
+      if (v) localStorage.setItem(TOKEN_KEY, v);
+      else localStorage.removeItem(TOKEN_KEY);
     } catch { /* 隐私模式忽略 */ }
   }
 

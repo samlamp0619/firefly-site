@@ -1,7 +1,7 @@
 @echo off
 setlocal
 title Firefly Cover Site - GitHub Pages Deploy
-cd /d "%~dp0"
+cd /d "%~dp0.."
 
 echo ==============================================
 echo    Firefly Cover Site - GitHub Pages Deploy

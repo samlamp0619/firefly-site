@@ -10,18 +10,21 @@
 node_modules/
 
 # 投稿管理令牌：只存本地，绝不进仓库
-submissions-token.txt
+**/submissions-token.txt
 
 # 拉取下来的投稿表格（含投稿人昵称，属于个人数据）
-投稿汇总.xlsx
+**/投稿汇总.xlsx
 
 # 考核成绩表（含 QQ 号，属于个人信息）
-考核成绩.xlsx
+**/考核成绩.xlsx
 
 # Python 缓存（跑 build_font.py 时会生成）
 __pycache__/
 
 # 聊天桥的本地配置和日志（含 AstrBot API Key）
-astrbot-config.txt
-astrbot-last-response.txt
-chat-bridge.log
+**/astrbot-config.txt
+**/astrbot-last-response.txt
+**/chat-bridge.log
+
+# 工具脚本跑完产生的临时文件
+**/__pycache__/

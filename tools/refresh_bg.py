@@ -19,7 +19,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-BASE = Path(__file__).resolve().parent
+BASE = Path(__file__).resolve().parent.parent   # 本脚本在 tools/，站点根是上一级
 RT_DIR = BASE / "assets" / "bg" / "realtime"
 # 本地兜底图已占用的 PID，避免重复
 USED_PIDS = {140591786, 144019913, 139886638, 143979655, 141185006, 143312965}
